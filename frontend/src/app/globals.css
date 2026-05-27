@@ -1,0 +1,265 @@
+/* src/app/globals.css */
+/* Purpose: Global CSS design tokens, base resets, and utility animations. */
+
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* ─── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Design Tokens (HSL Custom Properties) ────────────────────────────────── */
+:root {
+  /* Brand Colors */
+  --color-brand-50: 230 100% 97%;
+  --color-brand-100: 228 95% 93%;
+  --color-brand-200: 228 90% 85%;
+  --color-brand-300: 228 85% 74%;
+  --color-brand-400: 228 80% 62%;
+  --color-brand-500: 228 72% 52%;   /* Primary brand */
+  --color-brand-600: 228 68% 44%;
+  --color-brand-700: 228 65% 36%;
+  --color-brand-800: 228 60% 28%;
+  --color-brand-900: 228 58% 20%;
+
+  /* Semantic Tokens — Light Mode */
+  --background: 220 20% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+
+  --primary: 228 72% 52%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 220 15% 94%;
+  --secondary-foreground: 222 47% 11%;
+
+  --muted: 220 15% 94%;
+  --muted-foreground: 220 15% 46%;
+
+  --accent: 228 90% 95%;
+  --accent-foreground: 228 72% 40%;
+
+  --destructive: 0 84% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  --success: 145 63% 42%;
+  --success-foreground: 0 0% 100%;
+
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 100%;
+
+  --border: 220 15% 88%;
+  --input: 220 15% 88%;
+  --ring: 228 72% 52%;
+
+  --sidebar-bg: 222 47% 8%;
+  --sidebar-fg: 220 20% 92%;
+  --sidebar-border: 222 30% 16%;
+  --sidebar-accent: 228 72% 52%;
+  --sidebar-muted: 222 20% 60%;
+
+  --radius: 0.75rem;     /* rounded-xl */
+  --radius-card: 1rem;   /* rounded-2xl */
+  --radius-sm: 0.5rem;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 hsl(222 47% 11% / 0.05);
+  --shadow-sm: 0 1px 3px 0 hsl(222 47% 11% / 0.10), 0 1px 2px -1px hsl(222 47% 11% / 0.10);
+  --shadow-md: 0 4px 6px -1px hsl(222 47% 11% / 0.10), 0 2px 4px -2px hsl(222 47% 11% / 0.10);
+  --shadow-lg: 0 10px 15px -3px hsl(222 47% 11% / 0.10), 0 4px 6px -4px hsl(222 47% 11% / 0.10);
+  --shadow-xl: 0 20px 25px -5px hsl(222 47% 11% / 0.10), 0 8px 10px -6px hsl(222 47% 11% / 0.10);
+  --shadow-glow: 0 0 20px hsl(228 72% 52% / 0.25);
+}
+
+/* ─── Dark Mode Tokens ──────────────────────────────────────────────────────── */
+.dark {
+  --background: 222 47% 6%;
+  --foreground: 220 20% 92%;
+  --card: 222 35% 9%;
+  --card-foreground: 220 20% 92%;
+  --popover: 222 35% 9%;
+  --popover-foreground: 220 20% 92%;
+
+  --primary: 228 72% 60%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 222 25% 14%;
+  --secondary-foreground: 220 20% 92%;
+
+  --muted: 222 25% 14%;
+  --muted-foreground: 220 15% 55%;
+
+  --accent: 228 35% 18%;
+  --accent-foreground: 228 72% 75%;
+
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  --success: 145 55% 48%;
+  --success-foreground: 0 0% 100%;
+
+  --warning: 38 90% 52%;
+  --warning-foreground: 222 47% 8%;
+
+  --border: 222 25% 18%;
+  --input: 222 25% 18%;
+  --ring: 228 72% 60%;
+
+  --sidebar-bg: 222 47% 4%;
+  --sidebar-fg: 220 20% 88%;
+  --sidebar-border: 222 25% 12%;
+  --sidebar-accent: 228 72% 60%;
+  --sidebar-muted: 222 20% 50%;
+
+  --shadow-xs: 0 1px 2px 0 hsl(222 47% 2% / 0.5);
+  --shadow-sm: 0 1px 3px 0 hsl(222 47% 2% / 0.5), 0 1px 2px -1px hsl(222 47% 2% / 0.5);
+  --shadow-md: 0 4px 6px -1px hsl(222 47% 2% / 0.5), 0 2px 4px -2px hsl(222 47% 2% / 0.5);
+  --shadow-lg: 0 10px 15px -3px hsl(222 47% 2% / 0.5), 0 4px 6px -4px hsl(222 47% 2% / 0.5);
+  --shadow-xl: 0 20px 25px -5px hsl(222 47% 2% / 0.5), 0 8px 10px -6px hsl(222 47% 2% / 0.5);
+  --shadow-glow: 0 0 20px hsl(228 72% 60% / 0.3);
+}
+
+/* ─── Base Resets ───────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  line-height: 1.6;
+  min-height: 100dvh;
+}
+
+/* Monospace font for receipt numbers, barcodes, etc. */
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
+/* ─── Scrollbar Styling ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* ─── Focus Ring ────────────────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Selection Color ───────────────────────────────────────────────────────── */
+::selection {
+  background-color: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
+}
+
+/* ─── Micro Animations ──────────────────────────────────────────────────────── */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px hsl(var(--primary) / 0.3); }
+  50%       { box-shadow: 0 0 20px hsl(var(--primary) / 0.6); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position: 200% center; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-slide-up    { animation: slide-up 0.25s ease-out; }
+.animate-slide-down  { animation: slide-down 0.25s ease-out; }
+.animate-fade-in     { animation: fade-in 0.2s ease-out; }
+.animate-scale-in    { animation: scale-in 0.2s ease-out; }
+.animate-pulse-glow  { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-spin-slow   { animation: spin-slow 2s linear infinite; }
+
+/* Skeleton shimmer loader */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--secondary)) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Glass Morphism ────────────────────────────────────────────────────────── */
+.glass {
+  background: hsl(var(--card) / 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+.glass-dark {
+  background: hsl(var(--sidebar-bg) / 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid hsl(var(--sidebar-border) / 0.6);
+}
+
+/* ─── Gradient Text ─────────────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(228 90% 70%) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Status Pill Variants ──────────────────────────────────────────────────── */
+.status-online  { @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400; }
+.status-offline { @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400; }
+.status-syncing { @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400; }
+.status-error   { @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-600 dark:text-red-400; }
