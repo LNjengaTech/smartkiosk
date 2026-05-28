@@ -4,6 +4,7 @@
 // Purpose: Main API route configuration. Defines public/private V1 endpoints and middleware boundaries.
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\UploadController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +33,11 @@ Route::prefix('v1')->group(function () {
         // Session management
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/me', [AuthController::class, 'me']);
+
+        // ==========================================
+        // Image Upload (owner + manager only)
+        // ==========================================
+        Route::post('/upload', [UploadController::class, 'store']);
 
         // ------------------------------------------
         // Tenant boundary checking routes
