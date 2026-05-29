@@ -42,7 +42,7 @@ export interface LocalProduct {
   imageUrl: string | null;
   isActive: boolean;
   syncedAt: string | null;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 // ─── Local Category ───────────────────────────────────────────────────────────
@@ -124,4 +124,17 @@ export interface LocalExpense {
   expenseDate: string;
   syncedAt: string | null;
   createdAt: string;
+}
+// ─── Local Supplier ───────────────────────────────────────────────────────────
+
+export interface LocalSupplier {
+  id?: number;
+  uuid: string;
+  shopId: number;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  notes: string | null;
+  syncedAt: string | null;
 }

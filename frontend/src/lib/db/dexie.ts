@@ -10,6 +10,7 @@ import type {
   LocalSale,
   LocalStockMovement,
   LocalExpense,
+  LocalSupplier,
 } from '@/types/db';
 
 // ─── Database Class ───────────────────────────────────────────────────────────
@@ -19,6 +20,7 @@ class SmartKioskDatabase extends Dexie {
   syncQueue!: Table<SyncQueueEntry, number>;
   products!: Table<LocalProduct, number>;
   categories!: Table<LocalCategory, number>;
+  suppliers!: Table<LocalSupplier, number>;
   sales!: Table<LocalSale, number>;
   stockMovements!: Table<LocalStockMovement, number>;
   expenses!: Table<LocalExpense, number>;
@@ -51,6 +53,17 @@ class SmartKioskDatabase extends Dexie {
       stockMovements: '++id, &uuid, shopId, productId, [productId+occurredAt]',
 
       // Expenses — indexed by shop scope and date
+      expenses: '++id, &uuid, shopId, expenseDate, [shopId+expenseDate]',
+    });
+
+    // Stage 2 — added suppliers table
+    this.version(2).stores({
+      syncQueue: '++id, &operationUuid, resource, status, createdAt',
+      products: '++id, &uuid, shopId, barcode, [shopId+isActive], [shopId+categoryId]',
+      categories: '++id, &uuid, shopId, [shopId+name]',
+      suppliers: '++id, &uuid, shopId, name',
+      sales: '++id, &uuid, shopId, soldAt, [shopId+soldAt], syncedAt',
+      stockMovements: '++id, &uuid, shopId, productId, [productId+occurredAt]',
       expenses: '++id, &uuid, shopId, expenseDate, [shopId+expenseDate]',
     });
   }
