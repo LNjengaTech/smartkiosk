@@ -238,3 +238,93 @@ export interface ShopSubscription {
   created_at: string;
   updated_at: string;
 }
+
+// ─── Stage 2 API Response Interfaces ─────────────────────────────────────────
+
+export interface CategoryResponse {
+  id: string;
+  uuid: string;
+  shopId: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  productCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SupplierResponse {
+  id: string;
+  uuid: string;
+  shopId: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  notes: string | null;
+  productCount: number;
+  stockMovementCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductResponse {
+  id: string;
+  uuid: string;
+  shopId: string;
+  categoryId: string | null;
+  supplierId: string | null;
+  name: string;
+  sku: string | null;
+  barcode: string | null;
+  buyingPrice: number;
+  sellingPrice: number;
+  quantity: number;
+  reorderLevel: number;
+  unit: 'piece' | 'kg' | 'litre' | 'pack';
+  expiryDate: string | null;
+  imageUrl: string | null;
+  isActive: boolean;
+  category: Pick<CategoryResponse, 'id' | 'name'> | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductListMeta {
+  lowStockCount: number;
+  expiringSoonCount: number;
+  totalStockValue: number;
+}
+
+export interface ProductListResponse {
+  data: ProductResponse[];
+  total: number;
+  meta: ProductListMeta;
+}
+
+export interface StockMovementResponse {
+  id: string;
+  uuid: string;
+  shopId: string;
+  productId: string;
+  userId: string;
+  movementType: 'stock_in' | 'stock_out' | 'sale' | 'adjustment';
+  delta: number;
+  quantityBefore: number;
+  quantityAfter: number;
+  unitCost: number | null;
+  notes: string | null;
+  occurredAt: string;
+  product: { id: string; name: string; barcode: string | null };
+  user: { id: string; name: string };
+  createdAt: string;
+}
+
+export interface StockValuationResponse {
+  totalValue: number;
+  totalProducts: number;
+  lowStockCount: number;
+  outOfStockCount: number;
+  expiringSoonCount: number;
+}
+
