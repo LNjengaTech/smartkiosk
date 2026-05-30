@@ -6,6 +6,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Dashboard\CategoryController;
 use App\Http\Controllers\Api\V1\Dashboard\ProductController;
+use App\Http\Controllers\Api\V1\Dashboard\StockController;
 use App\Http\Controllers\Api\V1\UploadController;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +67,13 @@ Route::prefix('v1')->group(function () {
             Route::get('/products/{product}', [ProductController::class, 'show']);
             Route::put('/products/{product}', [ProductController::class, 'update']);
             Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+
+            // ==========================================
+            // Stock Management
+            // ==========================================
+            Route::get('/stock/movements', [StockController::class, 'movements']);
+            Route::get('/stock/valuation', [StockController::class, 'valuation']);
+            Route::post('/stock/adjust/{product}', [StockController::class, 'adjust']);
         });
     });
 });
