@@ -244,24 +244,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           is_active: values.is_active,
         });
 
-        // Background API call if online
-        if (navigator.onLine) {
-          apiClient.put(`/products/${product.id}`, {
-            category_id: values.category_id ? parseInt(values.category_id) : null,
-            supplier_id: values.supplier_id ? parseInt(values.supplier_id) : null,
-            name: values.name,
-            sku: values.sku || null,
-            barcode: values.barcode || null,
-            buying_price: values.buying_price,
-            selling_price: values.selling_price,
-            quantity: values.quantity,
-            reorder_level: values.reorder_level,
-            unit: values.unit,
-            expiry_date: values.expiry_date || null,
-            image_url: values.image_url || null,
-            is_active: values.is_active,
-          }).catch((err) => console.error('[ProductForm] PUT sync error:', getErrorMessage(err)));
-        }
+
       } else {
         // ── CREATE Product in Dexie IndexedDB ──
         const { nanoid } = await import('nanoid');
@@ -304,24 +287,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           is_active: values.is_active,
         });
 
-        // Background API call if online
-        if (navigator.onLine) {
-          apiClient.post('/products', {
-            category_id: values.category_id ? parseInt(values.category_id) : null,
-            supplier_id: values.supplier_id ? parseInt(values.supplier_id) : null,
-            name: values.name,
-            sku: values.sku || null,
-            barcode: values.barcode || null,
-            buying_price: values.buying_price,
-            selling_price: values.selling_price,
-            quantity: values.quantity,
-            reorder_level: values.reorder_level,
-            unit: values.unit,
-            expiry_date: values.expiry_date || null,
-            image_url: values.image_url || null,
-            is_active: values.is_active,
-          }).catch((err) => console.error('[ProductForm] POST sync error:', getErrorMessage(err)));
-        }
+
       }
 
       toast.success('Product saved successfully');
@@ -609,16 +575,25 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
               />
 
               {/* Product Image */}
-              <FormItem>
-                <FormLabel>Product Image</FormLabel>
-                <ImageUpload
-                  value={watchedValues.image_url ? [watchedValues.image_url] : []}
-                  onChange={(urls) => form.setValue('image_url', urls[0] ?? '')}
-                  onRemove={() => form.setValue('image_url', '')}
-                  folder="smartkiosk/products"
-                  maxImages={1}
-                />
-              </FormItem>
+              <FormField
+                control={form.control}
+                name="image_url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Image</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        value={watchedValues.image_url ? [watchedValues.image_url] : []}
+                        onChange={(urls) => form.setValue('image_url', urls[0] ?? '')}
+                        onRemove={() => form.setValue('image_url', '')}
+                        folder="smartkiosk/products"
+                        maxImages={1}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Active Switch */}
               <FormField

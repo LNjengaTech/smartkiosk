@@ -168,12 +168,7 @@ export default function CategoriesPage() {
         uuid: category.uuid,
       });
 
-      // 3. Call backend if online
-      if (navigator.onLine && category.id) {
-        apiClient.delete(`/categories/${category.id}`).catch((err: unknown) => {
-          console.error('[Categories] Failed to delete in background:', getErrorMessage(err));
-        });
-      }
+
 
       toast.success('Category deleted successfully');
       setConfirmDeleteId(null);

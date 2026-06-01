@@ -301,12 +301,7 @@ export default function ProductsPage() {
         uuid: prod.uuid,
       });
 
-      // 3. Call backend if online
-      if (navigator.onLine && prod.id) {
-        apiClient.delete(`/products/${prod.id}`).catch((err) => {
-          console.error('[Products] Failed to delete on server:', getErrorMessage(err));
-        });
-      }
+
 
       toast.success('Product removed successfully');
       setConfirmDeleteId(null);

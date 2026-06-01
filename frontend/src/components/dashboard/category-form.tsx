@@ -102,14 +102,7 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
           image_url:   values.image_url   || null,
         });
 
-        // Background API call if online
-        if (navigator.onLine) {
-          apiClient.put(`/categories/${category.id}`, {
-            name:        values.name,
-            description: values.description || null,
-            image_url:   values.image_url   || null,
-          }).catch((err: unknown) => console.error('[CategoryForm] update error:', getErrorMessage(err)));
-        }
+
       } else {
         // ── Create mode — write to IndexedDB immediately ──
         const { nanoid } = await import('nanoid');
@@ -132,14 +125,7 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
           image_url:   values.image_url   || null,
         });
 
-        // Background API call if online
-        if (navigator.onLine) {
-          apiClient.post('/categories', {
-            name:        values.name,
-            description: values.description || null,
-            image_url:   values.image_url   || null,
-          }).catch((err: unknown) => console.error('[CategoryForm] create error:', getErrorMessage(err)));
-        }
+
       }
 
       toast.success('Category saved');

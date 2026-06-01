@@ -6,6 +6,7 @@
 
 import { useOffline } from '@/hooks/use-offline';
 import { useSyncStatus } from '@/hooks/use-sync-status';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   Wifi,
@@ -18,6 +19,11 @@ import {
 export function OfflineIndicator() {
   const isOffline = useOffline();
   const { engineStatus, pendingCount, isSyncing } = useSyncStatus();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Determine display state
   const state = isOffline
@@ -64,7 +70,7 @@ export function OfflineIndicator() {
   } as const;
 
   const current = config[state];
-  if (!current.show) return null;
+  if (!mounted || !current.show) return null;
 
   return (
     <div

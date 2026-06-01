@@ -158,11 +158,7 @@ export default function SuppliersPage() {
         uuid: supplier.uuid,
       });
 
-      if (navigator.onLine && supplier.id) {
-        apiClient.delete(`/suppliers/${supplier.id}`).catch((err: unknown) => {
-          console.error('[Suppliers] Failed to delete in background:', getErrorMessage(err));
-        });
-      }
+
 
       toast.success('Supplier deleted successfully');
       setConfirmDeleteId(null);

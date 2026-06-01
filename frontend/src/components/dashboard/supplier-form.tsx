@@ -89,15 +89,7 @@ export function SupplierForm({ supplier, onSuccess }: SupplierFormProps) {
           notes: values.notes || null,
         });
 
-        if (navigator.onLine) {
-          apiClient.put(`/suppliers/${supplier.id}`, {
-            name: values.name,
-            phone: values.phone || null,
-            email: values.email || null,
-            address: values.address || null,
-            notes: values.notes || null,
-          }).catch((err: unknown) => console.error('[SupplierForm] update error:', getErrorMessage(err)));
-        }
+
       } else {
         const localUuid = nanoid();
 
@@ -121,15 +113,7 @@ export function SupplierForm({ supplier, onSuccess }: SupplierFormProps) {
           notes: values.notes || null,
         });
 
-        if (navigator.onLine) {
-          apiClient.post('/suppliers', {
-            name: values.name,
-            phone: values.phone || null,
-            email: values.email || null,
-            address: values.address || null,
-            notes: values.notes || null,
-          }).catch((err: unknown) => console.error('[SupplierForm] create error:', getErrorMessage(err)));
-        }
+
       }
 
       toast.success('Supplier saved');
