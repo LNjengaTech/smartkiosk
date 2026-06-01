@@ -187,16 +187,25 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
         />
 
         {/* Image */}
-        <FormItem>
-          <FormLabel>Category Image</FormLabel>
-          <ImageUpload
-            value={imageUrls}
-            onChange={handleImageChange}
-            onRemove={handleImageRemove}
-            folder="smartkiosk/categories"
-            maxImages={1}
-          />
-        </FormItem>
+        <FormField
+          control={form.control}
+          name="image_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category Image</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  value={imageUrls}
+                  onChange={handleImageChange}
+                  onRemove={handleImageRemove}
+                  folder="smartkiosk/categories"
+                  maxImages={1}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Submit */}
         <div className="flex justify-end gap-3 pt-2">

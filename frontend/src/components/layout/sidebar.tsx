@@ -21,6 +21,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Folder,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logout } from '@/lib/api/auth';
@@ -44,6 +45,12 @@ const navItems = [
     title: 'Products',
     href: '/products',
     icon: Package,
+    roles: ['owner', 'manager'],
+  },
+  {
+    title: 'Categories',
+    href: '/products/categories',
+    icon: Folder,
     roles: ['owner', 'manager'],
   },
   {
