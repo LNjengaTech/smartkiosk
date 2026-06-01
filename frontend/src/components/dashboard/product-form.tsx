@@ -344,7 +344,17 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (step < 3) {
+              nextStep();
+            } else {
+              form.handleSubmit(onSubmit)(e);
+            }
+          }}
+          className="space-y-5"
+        >
           {/* STEP 1: Basic Details */}
           {step === 1 && (
             <div className="space-y-4 animate-fade-in">
