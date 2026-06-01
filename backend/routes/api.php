@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Dashboard\CategoryController;
 use App\Http\Controllers\Api\V1\Dashboard\ProductController;
 use App\Http\Controllers\Api\V1\Dashboard\StockController;
+use App\Http\Controllers\Api\V1\Dashboard\SupplierController;
 use App\Http\Controllers\Api\V1\UploadController;
 use Illuminate\Support\Facades\Route;
 
@@ -74,6 +75,13 @@ Route::prefix('v1')->group(function () {
             Route::get('/stock/movements', [StockController::class, 'movements']);
             Route::get('/stock/valuation', [StockController::class, 'valuation']);
             Route::post('/stock/adjust/{product}', [StockController::class, 'adjust']);
+
+            // ==========================================
+            // Supplier Management (Owner Only)
+            // ==========================================
+            Route::middleware('role:owner')->group(function () {
+                Route::apiResource('suppliers', SupplierController::class);
+            });
         });
     });
 });

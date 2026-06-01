@@ -54,4 +54,20 @@ class Supplier extends Model
     {
         return $query->where('shop_id', $shopId);
     }
+
+    /**
+     * Get all products linked to this supplier.
+     */
+    public function products(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Product::class, 'supplier_id');
+    }
+
+    /**
+     * Get all stock movements (e.g. stock-ins) linked to this supplier.
+     */
+    public function stockMovements(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(StockMovement::class, 'reference');
+    }
 }
