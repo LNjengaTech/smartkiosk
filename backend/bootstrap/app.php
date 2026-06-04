@@ -23,15 +23,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Stateful domains for Sanctum single-page application auth
-        $middleware->statefulApi();
-
+        // NOTE: statefulApi() is intentionally omitted.
+        // This app uses Bearer token auth (localStorage → Authorization header),
+        // not Sanctum's cookie/session SPA flow. Enabling statefulApi() would
+        // enforce CSRF verification on API routes and cause 419 mismatches.
+    
         // Register custom middleware aliases
         $middleware->alias([
             'shop.access' => EnsureShopAccess::class,
@@ -43,7 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Modern exception rendering inside API boundary checks
-
+    
         // 1. Validation Exception Mapping (422)
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
@@ -111,7 +113,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*')) {
                 $errorId = Str::uuid()->toString();
 
-                Log::error("API_SERVER_ERROR [{$errorId}]: ".$e->getMessage(), [
+                Log::error("API_SERVER_ERROR [{$errorId}]: " . $e->getMessage(), [
                     'error_id' => $errorId,
                     'exception' => get_class($e),
                     'file' => $e->getFile(),
