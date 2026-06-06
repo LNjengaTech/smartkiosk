@@ -99,6 +99,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
 
       {/* Top Close Button */}
       <button
+        type="button"
         onClick={onClose}
         className="absolute top-3 right-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white/80 hover:text-white transition-colors"
         aria-label="Close scanner"
@@ -120,7 +121,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
             <span className="absolute top-2 left-2 text-xs text-primary/80 font-bold font-mono">SCAN</span>
           </div>
 
-          <style jsx global>{`
+          <style>{`
             @keyframes scan-laser {
               0% { top: 0%; }
               50% { top: 100%; }
@@ -150,7 +151,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
               Please grant camera permissions to scan barcodes directly using your device.
             </p>
           </div>
-          <Button onClick={startScanner} variant="outline" className="text-zinc-200 border-zinc-700 hover:bg-zinc-800">
+          <Button type="button" onClick={startScanner} variant="outline" className="text-zinc-200 border-zinc-700 hover:bg-zinc-800">
             <Camera className="mr-2 h-4 w-4" /> Try Again
           </Button>
         </div>

@@ -73,6 +73,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   const isEditMode = product !== undefined;
   const [step, setStep] = useState(1);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
   // Lists for dropdown options
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
@@ -97,6 +98,15 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       is_active:     product?.isActive      ?? true,
     },
   });
+
+  // Prevent double-click accidental submission on step transition
+  useEffect(() => {
+    if (step === 3) {
+      setIsSubmitDisabled(true);
+      const timer = setTimeout(() => setIsSubmitDisabled(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [step]);
 
   // Fetch categories & suppliers from local Dexie database (offline-first)
   useEffect(() => {
@@ -643,7 +653,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                 Next <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={form.formState.isSubmitting} className="shadow-md">
+              <Button type="submit" disabled={form.formState.isSubmitting || isSubmitDisabled} className="shadow-md">
                 {form.formState.isSubmitting ? (
                   'Saving Product...'
                 ) : (
