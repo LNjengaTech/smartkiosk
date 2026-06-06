@@ -138,3 +138,10 @@ export interface LocalSupplier {
   notes: string | null;
   syncedAt: string | null;
 }
+
+// ─── Offline Cart (POS singleton) ─────────────────────────────────────────────
+
+export interface OfflineCart {
+  id: number;    // always 1 — singleton row
+  state: string; // JSON-serialised CartState
+}

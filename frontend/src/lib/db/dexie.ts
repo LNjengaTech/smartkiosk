@@ -11,6 +11,7 @@ import type {
   LocalStockMovement,
   LocalExpense,
   LocalSupplier,
+  OfflineCart,
 } from '@/types/db';
 
 // ─── Database Class ───────────────────────────────────────────────────────────
@@ -24,6 +25,7 @@ class SmartKioskDatabase extends Dexie {
   sales!: Table<LocalSale, number>;
   stockMovements!: Table<LocalStockMovement, number>;
   expenses!: Table<LocalExpense, number>;
+  cart!: Table<OfflineCart, number>;
 
   constructor() {
     super('SmartKioskDB');
@@ -65,6 +67,19 @@ class SmartKioskDatabase extends Dexie {
       sales: '++id, &uuid, shopId, soldAt, [shopId+soldAt], syncedAt',
       stockMovements: '++id, &uuid, shopId, productId, [productId+occurredAt]',
       expenses: '++id, &uuid, shopId, expenseDate, [shopId+expenseDate]',
+    });
+
+    // Stage 3 — added cart singleton table for POS offline resilience
+    this.version(3).stores({
+      syncQueue: '++id, &operationUuid, resource, status, createdAt',
+      products: '++id, &uuid, shopId, barcode, [shopId+isActive], [shopId+categoryId]',
+      categories: '++id, &uuid, shopId, [shopId+name]',
+      suppliers: '++id, &uuid, shopId, name',
+      sales: '++id, &uuid, shopId, soldAt, [shopId+soldAt], syncedAt',
+      stockMovements: '++id, &uuid, shopId, productId, [productId+occurredAt]',
+      expenses: '++id, &uuid, shopId, expenseDate, [shopId+expenseDate]',
+      // Singleton cart row — id is always 1
+      cart: 'id',
     });
   }
 }
