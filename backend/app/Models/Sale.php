@@ -64,15 +64,16 @@ class Sale extends Model
     }
 
     /**
-     * Generate custom incremental receipt serial keys.
+     * Generate collision-free receipt number using PostgreSQL sequence.
+     * Replaces the old row-count method that was prone to race conditions.
      */
     public static function generateReceiptNumber(): string
     {
         $year = Carbon::now()->year;
-        // Count sales today to create a sequence
-        $count = self::whereYear('created_at', $year)->count() + 1;
-
-        return sprintf('SK-%d-%06d', $year, $count);
+        $sequence = \Illuminate\Support\Facades\DB::selectOne(
+            "SELECT nextval('receipt_sequence') AS seq"
+        )->seq;
+        return sprintf('SK-%d-%06d', $year, $sequence);
     }
 
     /**

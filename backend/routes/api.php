@@ -8,6 +8,9 @@ use App\Http\Controllers\Api\V1\Dashboard\CategoryController;
 use App\Http\Controllers\Api\V1\Dashboard\ProductController;
 use App\Http\Controllers\Api\V1\Dashboard\StockController;
 use App\Http\Controllers\Api\V1\Dashboard\SupplierController;
+use App\Http\Controllers\Api\V1\Dashboard\SaleController;
+use App\Http\Controllers\Api\V1\Dashboard\MpesaController;
+use App\Http\Controllers\Api\V1\Sync\SyncController;
 use App\Http\Controllers\Api\V1\UploadController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +31,7 @@ Route::prefix('v1')->group(function () {
     // Public Authentication Endpoints
     // ==========================================
     Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/payments/mpesa/callback', [MpesaController::class, 'callback'])->name('api.mpesa.callback');
 
     // ==========================================
     // Protected Session & Tenant Endpoints
@@ -42,6 +46,11 @@ Route::prefix('v1')->group(function () {
         // Image Upload (owner + manager only)
         // ==========================================
         Route::post('/upload', [UploadController::class, 'store']);
+
+        // ==========================================
+        // Offline Sync Engine Batch Processing
+        // ==========================================
+        Route::post('/sync/batch', [SyncController::class, 'batch']);
 
         // ==========================================
         // Product SmartScan finder (<50ms target)
@@ -75,6 +84,20 @@ Route::prefix('v1')->group(function () {
             Route::get('/stock/movements', [StockController::class, 'movements']);
             Route::get('/stock/valuation', [StockController::class, 'valuation']);
             Route::post('/stock/adjust/{product}', [StockController::class, 'adjust']);
+
+            // ==========================================
+            // Sales Management
+            // ==========================================
+            Route::get('/sales', [SaleController::class, 'index']);
+            Route::post('/sales', [SaleController::class, 'store']);
+            Route::get('/sales/{sale}', [SaleController::class, 'show']);
+            Route::post('/sales/{sale}/void', [SaleController::class, 'void']);
+
+            // ==========================================
+            // M-Pesa Integration (Private)
+            // ==========================================
+            Route::post('/payments/mpesa/stk-push', [MpesaController::class, 'stkPush']);
+            Route::get('/payments/mpesa/status/{checkoutRequestId}', [MpesaController::class, 'status']);
 
             // ==========================================
             // Supplier Management (Owner Only)
