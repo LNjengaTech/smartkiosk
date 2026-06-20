@@ -186,7 +186,7 @@ export function PaymentMpesa({ total, onReferenceChange }: PaymentMpesaProps) {
           className="font-mono tracking-wider uppercase"
         />
         <p className="text-xs text-muted-foreground">
-          Auto-filled on success, or enter manually from customer's SMS.
+          Auto-filled on success, or enter manually from customer&apos;s SMS.
         </p>
       </div>
     </div>

@@ -26,7 +26,7 @@ interface SyncState {
 
 // ─── Store Definition ─────────────────────────────────────────────────────────
 
-export const useSyncStore = create<SyncState>()((set, get) => ({
+export const useSyncStore = create<SyncState>()((set) => ({
   isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
   engineStatus: 'idle',
   pendingCount: 0,

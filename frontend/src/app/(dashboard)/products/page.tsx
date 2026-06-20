@@ -5,7 +5,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Search, Filter, AlertCircle, ShoppingBag, DollarSign, Calendar, Layers, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, AlertCircle, ShoppingBag, DollarSign, Calendar, Layers, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -78,7 +78,7 @@ export default function ProductsPage() {
           name: c.name,
           description: c.description,
           imageUrl: c.imageUrl,
-          productCount: (c as any).productCount ?? 0,
+          productCount: (c as unknown as { productCount?: number }).productCount ?? 0,
           createdAt: '',
           updatedAt: '',
         }))
@@ -144,7 +144,7 @@ export default function ProductsPage() {
                   imageUrl: sprod.imageUrl,
                   isActive: sprod.isActive,
                   syncedAt: new Date().toISOString(),
-                } as any);
+                });
               } else {
                 await db.products.add({
                   uuid: sprod.uuid,
@@ -163,7 +163,7 @@ export default function ProductsPage() {
                   imageUrl: sprod.imageUrl,
                   isActive: sprod.isActive,
                   syncedAt: new Date().toISOString(),
-                } as any);
+                });
               }
             }
 

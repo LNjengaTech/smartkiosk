@@ -20,7 +20,6 @@ import { Button } from '@/components/ui/button';
 import { syncEngine } from '@/lib/sync/sync-engine';
 import { getDb } from '@/lib/db/dexie';
 import { getErrorMessage } from '@/lib/utils';
-import apiClient from '@/lib/api/client';
 import type { SupplierResponse } from '@/types/api';
 
 const supplierSchema = z.object({

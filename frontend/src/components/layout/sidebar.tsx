@@ -96,7 +96,7 @@ export function Sidebar() {
       await logout();
       clearSession();
       router.push('/login');
-    } catch (error) {
+    } catch {
       toast.error('Failed to log out cleanly, clearing local session.');
       clearSession();
       router.push('/login');
@@ -134,7 +134,7 @@ export function Sidebar() {
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
           return (
-            <RoleGate key={item.href} anyRole={item.roles as any}>
+            <RoleGate key={item.href} anyRole={[...item.roles]}>
               <Link
                 href={item.href}
                 className={cn(

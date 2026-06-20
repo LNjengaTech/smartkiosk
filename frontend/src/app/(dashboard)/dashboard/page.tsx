@@ -17,7 +17,7 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground mt-1">
-          Welcome back, {user?.name.split(' ')[0]}. Here is what's happening at {shop?.business_name}.
+          Welcome back, {user?.name.split(' ')[0]}. Here is what&apos;s happening at {shop?.business_name}.
         </p>
       </div>
 

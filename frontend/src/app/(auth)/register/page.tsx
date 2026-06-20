@@ -40,14 +40,14 @@ export default function RegisterPage() {
     },
   });
 
-  async function onSubmit(values: RegisterFormValues) {
+  async function onSubmit() {
     setIsLoading(true);
     try {
       // TODO: Implement actual registration API call here
       // const data = await register(values);
       toast.success('Registration successful! Please log in.');
       router.push('/login');
-    } catch (error) {
+    } catch {
       toast.error('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);

@@ -15,7 +15,7 @@ interface SyncStatusProps {
 }
 
 export function SyncStatus({ className, compact = false }: SyncStatusProps) {
-  const { isOnline, engineStatus, pendingCount, lastSyncedAt, lastError } =
+  const { engineStatus, pendingCount, lastSyncedAt, lastError } =
     useSyncStatus();
 
   const iconMap = {

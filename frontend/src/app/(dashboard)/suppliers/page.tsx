@@ -48,8 +48,8 @@ export default function SuppliersPage() {
         email: sup.email,
         address: sup.address,
         notes: sup.notes,
-        productCount: (sup as any).productCount ?? 0,
-        stockMovementCount: (sup as any).stockMovementCount ?? 0,
+        productCount: sup.productCount ?? 0,
+        stockMovementCount: sup.stockMovementCount ?? 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }));
@@ -78,7 +78,7 @@ export default function SuppliersPage() {
                   syncedAt: new Date().toISOString(),
                   productCount: ssup.productCount,
                   stockMovementCount: ssup.stockMovementCount,
-                } as any);
+                });
               } else {
                 await db.suppliers.add({
                   uuid: ssup.uuid,
@@ -91,7 +91,7 @@ export default function SuppliersPage() {
                   syncedAt: new Date().toISOString(),
                   productCount: ssup.productCount,
                   stockMovementCount: ssup.stockMovementCount,
-                } as any);
+                });
               }
             }
 
@@ -114,8 +114,8 @@ export default function SuppliersPage() {
               email: sup.email,
               address: sup.address,
               notes: sup.notes,
-              productCount: (sup as any).productCount ?? 0,
-              stockMovementCount: (sup as any).stockMovementCount ?? 0,
+              productCount: sup.productCount ?? 0,
+              stockMovementCount: sup.stockMovementCount ?? 0,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             }))

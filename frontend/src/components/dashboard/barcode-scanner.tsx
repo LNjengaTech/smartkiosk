@@ -73,7 +73,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
           // Silent scan failure (normal between frames)
         }
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[BarcodeScanner] error:', err);
       setHasPermission(false);
       setIsInitializing(false);
@@ -90,6 +90,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
         scannerRef.current.stop().catch(() => {});
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

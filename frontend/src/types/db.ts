@@ -55,6 +55,8 @@ export interface LocalCategory {
   description: string | null;
   imageUrl: string | null;
   syncedAt: string | null;
+  /** Cached from server — not written by sync engine, display-only */
+  productCount?: number;
 }
 
 // ─── Local Sale (POS Pending Transaction) ─────────────────────────────────────
@@ -137,6 +139,9 @@ export interface LocalSupplier {
   address: string | null;
   notes: string | null;
   syncedAt: string | null;
+  /** Cached from server — display-only */
+  productCount?: number;
+  stockMovementCount?: number;
 }
 
 // ─── Offline Cart (POS singleton) ─────────────────────────────────────────────

@@ -23,7 +23,6 @@ import { ImageUpload } from '@/components/dashboard/image-upload';
 import { syncEngine } from '@/lib/sync/sync-engine';
 import { getDb } from '@/lib/db/dexie';
 import { getErrorMessage } from '@/lib/utils';
-import apiClient from '@/lib/api/client';
 import type { CategoryResponse } from '@/types/api';
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
@@ -76,13 +75,12 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
     form.setValue('image_url', urls[0] ?? '');
   };
 
-  const handleImageRemove = (_url: string) => {
+  const handleImageRemove = () => {
     form.setValue('image_url', '');
   };
 
   const onSubmit = async (values: CategoryFormValues) => {
     const db = getDb();
-    const now = new Date().toISOString();
 
     try {
       if (isEditMode && category) {
@@ -176,7 +174,7 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
         <FormField
           control={form.control}
           name="image_url"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormLabel>Category Image</FormLabel>
               <FormControl>

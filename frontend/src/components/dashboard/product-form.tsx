@@ -35,7 +35,6 @@ import { getDb } from '@/lib/db/dexie';
 import { syncEngine } from '@/lib/sync/sync-engine';
 import { computeCompleteness } from '@/lib/product-completeness';
 import { getErrorMessage } from '@/lib/utils';
-import apiClient from '@/lib/api/client';
 import type { ProductResponse, CategoryResponse, SupplierResponse } from '@/types/api';
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
@@ -598,7 +597,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
               <FormField
                 control={form.control}
                 name="image_url"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Product Image</FormLabel>
                     <FormControl>

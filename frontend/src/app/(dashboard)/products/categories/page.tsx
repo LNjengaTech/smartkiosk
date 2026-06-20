@@ -53,7 +53,7 @@ export default function CategoriesPage() {
         name: cat.name,
         description: cat.description,
         imageUrl: cat.imageUrl,
-        productCount: (cat as any).productCount ?? 0,
+        productCount: cat.productCount ?? 0,
         createdAt: new Date().toISOString(), // fallback
         updatedAt: new Date().toISOString(), // fallback
       }));
@@ -69,10 +69,6 @@ export default function CategoriesPage() {
 
           // Perform background reconciliation in IndexedDB
           await db.transaction('rw', db.categories, async () => {
-            // Keep local categories that haven't synced yet (syncedAt is null)
-            const localUnsynced = await db.categories.where('syncedAt').equals('').toArray(); // or check syncedAt is null
-            const unsyncedUuids = new Set(localUnsynced.map((c) => c.uuid));
-
             // Overwrite categories in IndexedDB with server data (excluding unsynced ones)
             for (const scat of serverCats) {
               const existing = await db.categories.where('uuid').equals(scat.uuid).first();
@@ -83,8 +79,8 @@ export default function CategoriesPage() {
                   description: scat.description,
                   imageUrl: scat.imageUrl,
                   syncedAt: new Date().toISOString(),
-                  productCount: scat.productCount, // store dynamically
-                } as any);
+                  productCount: scat.productCount,
+                });
               } else {
                 await db.categories.add({
                   uuid: scat.uuid,
@@ -94,7 +90,7 @@ export default function CategoriesPage() {
                   imageUrl: scat.imageUrl,
                   syncedAt: new Date().toISOString(),
                   productCount: scat.productCount,
-                } as any);
+                });
               }
             }
 
@@ -118,7 +114,7 @@ export default function CategoriesPage() {
               name: cat.name,
               description: cat.description,
               imageUrl: cat.imageUrl,
-              productCount: (cat as any).productCount ?? 0,
+              productCount: cat.productCount ?? 0,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             }))

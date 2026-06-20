@@ -115,18 +115,21 @@ export function SmartScanModal({ open, onClose, onProductFound }: SmartScanModal
 
   const startScanner = useCallback(async () => {
     try {
-      const { Html5Qrcode } = await import('html5-qrcode');
+      const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
 
       // Wait for the DOM element to exist
       await new Promise<void>((resolve) => setTimeout(resolve, 100));
 
-      scannerRef.current = new Html5Qrcode('smartscan-reader');
+      const formatsToSupport = SUPPORTED_FORMATS.map(
+        (f) => Html5QrcodeSupportedFormats[f as keyof typeof Html5QrcodeSupportedFormats]
+      ).filter(Boolean);
+
+      scannerRef.current = new Html5Qrcode('smartscan-reader', { formatsToSupport, verbose: false });
       await scannerRef.current.start(
         { facingMode: 'environment' },
         {
           fps: 10,
           qrbox: { width: 250, height: 200 },
-          formatsToSupport: SUPPORTED_FORMATS as Parameters<typeof Html5Qrcode.prototype.start>[2]['formatsToSupport'],
         },
         async (decodedText) => {
           // Pause scanner while looking up
