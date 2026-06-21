@@ -95,10 +95,10 @@ export interface AttendantPerformance {
 export interface ExpenseReport {
   period: { from: string; to: string };
   totalExpenses: number;
-  byCategory: ExpenseCategory[];
+  byCategory: ExpenseCategorySummary[];
 }
 
-export interface ExpenseCategory {
+export interface ExpenseCategorySummary {
   category: string;
   total: number;
   count: number;
