@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Dashboard\StockController;
 use App\Http\Controllers\Api\V1\Dashboard\SupplierController;
 use App\Http\Controllers\Api\V1\Dashboard\SaleController;
 use App\Http\Controllers\Api\V1\Dashboard\MpesaController;
+use App\Http\Controllers\Api\V1\Dashboard\ReportController;
 use App\Http\Controllers\Api\V1\Sync\SyncController;
 use App\Http\Controllers\Api\V1\UploadController;
 use Illuminate\Support\Facades\Route;
@@ -104,6 +105,21 @@ Route::prefix('v1')->group(function () {
             // ==========================================
             Route::middleware('role:owner')->group(function () {
                 Route::apiResource('suppliers', SupplierController::class);
+            });
+
+            // ==========================================
+            // Reports & Business Intelligence
+            // ==========================================
+            Route::prefix('reports')->group(function () {
+                Route::get('/dashboard', [ReportController::class, 'dashboard']);
+                Route::get('/sales', [ReportController::class, 'sales']);
+                Route::get('/stock', [ReportController::class, 'stock']);
+                Route::get('/attendants', [ReportController::class, 'attendants']);
+                Route::get('/expenses', [ReportController::class, 'expenses']);
+                Route::get('/export', [ReportController::class, 'export']);
+
+                // Owner-only profit report
+                Route::middleware('role:owner|super_admin')->get('/profit', [ReportController::class, 'profit']);
             });
         });
     });
