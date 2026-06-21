@@ -358,7 +358,7 @@ export default function ProductsPage() {
       {/* Stats Cards Section */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total items */}
-        <div className="p-4 rounded-2xl border border-border/60 bg-card shadow-xs flex items-center gap-4">
+        <div className="p-4 rounded-2xl border border-border bg-card shadow-xs flex items-center gap-4">
           <div className="p-3 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
             <ShoppingBag className="h-5 w-5" />
           </div>
@@ -369,7 +369,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Total Stock Valuation */}
-        <div className="p-4 rounded-2xl border border-border/60 bg-card shadow-xs flex items-center gap-4">
+        <div className="p-4 rounded-2xl border border-border bg-card shadow-xs flex items-center gap-4">
           <div className="p-3 rounded-xl bg-green-500/10 text-green-600 dark:text-green-400">
             <DollarSign className="h-5 w-5" />
           </div>
@@ -380,7 +380,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Low Stock Warning */}
-        <div className="p-4 rounded-2xl border border-border/60 bg-card shadow-xs flex items-center gap-4">
+        <div className="p-4 rounded-2xl border border-border bg-card shadow-xs flex items-center gap-4">
           <div className={`p-3 rounded-xl ${stats.lowStockCount > 0 ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
             <AlertCircle className="h-5 w-5" />
           </div>
@@ -391,7 +391,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Expiring Soon */}
-        <div className="p-4 rounded-2xl border border-border/60 bg-card shadow-xs flex items-center gap-4">
+        <div className="p-4 rounded-2xl border border-border bg-card shadow-xs flex items-center gap-4">
           <div className={`p-3 rounded-xl ${stats.expiringSoonCount > 0 ? 'bg-amber-500/10 text-amber-500' : 'bg-muted text-muted-foreground'}`}>
             <Calendar className="h-5 w-5" />
           </div>
@@ -471,7 +471,7 @@ export default function ProductsPage() {
 
       {/* Main Catalogue Table */}
       {filteredProducts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/60 p-12 text-center bg-card">
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border p-12 text-center bg-card">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted">
             <ShoppingBag className="h-6 w-6 text-muted-foreground" />
           </div>

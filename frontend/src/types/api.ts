@@ -224,6 +224,22 @@ export interface Expense {
   updated_at: string;
 }
 
+export interface ExpenseResponse {
+  id: string;
+  uuid: string;
+  shopId: string;
+  userId: string;
+  userName: string;
+  category: ExpenseCategory;
+  amount: number;
+  description: string | null;
+  expenseDate: string;
+  receiptUrl: string | null;
+  syncedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── Subscription ─────────────────────────────────────────────────────────────
 
 export type PlanName = 'basic' | 'pro' | 'enterprise';

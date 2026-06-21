@@ -98,8 +98,49 @@ class SyncController extends Controller
                         'status' => 'success',
                         'synced_at' => now(),
                     ]);
+                } elseif ($resourceType === 'expense') {
+                    $operationType = $operation['operationType'] ?? null;
+                    if ($operationType === 'CREATE') {
+                        \App\Models\Expense::updateOrCreate(
+                            ['uuid' => $payload['uuid'] ?? $resourceUuid, 'shop_id' => $shopId],
+                            [
+                                'user_id'      => $user->id,
+                                'category'     => $payload['category'],
+                                'amount'       => $payload['amount'],
+                                'description'  => $payload['description'] ?? null,
+                                'expense_date' => $payload['expenseDate'] ?? $payload['expense_date'] ?? now()->format('Y-m-d'),
+                                'receipt_url'  => $payload['receiptUrl'] ?? $payload['receipt_url'] ?? null,
+                            ]
+                        );
+                    } elseif ($operationType === 'UPDATE') {
+                        $expense = \App\Models\Expense::where('uuid', $payload['uuid'] ?? $resourceUuid)->first();
+                        if ($expense) {
+                            $expense->update([
+                                'category'     => $payload['category'],
+                                'amount'       => $payload['amount'],
+                                'description'  => $payload['description'] ?? null,
+                                'expense_date' => $payload['expenseDate'] ?? $payload['expense_date'] ?? $expense->expense_date,
+                                'receipt_url'  => $payload['receiptUrl'] ?? $payload['receipt_url'] ?? null,
+                            ]);
+                        }
+                    } elseif ($operationType === 'DELETE') {
+                        $expense = \App\Models\Expense::where('uuid', $payload['uuid'] ?? $resourceUuid)->first();
+                        if ($expense) {
+                            $expense->delete();
+                        }
+                    }
+
+                    SyncLog::create([
+                        'shop_id' => $shopId,
+                        'user_id' => $user->id,
+                        'operation_uuid' => $operationUuid,
+                        'resource_type' => $resourceType,
+                        'resource_uuid' => $payload['uuid'] ?? $resourceUuid,
+                        'status' => 'success',
+                        'synced_at' => now(),
+                    ]);
                 } else {
-                    // expense etc stub
+                    // generic fallback stub
                     SyncLog::create([
                         'shop_id' => $shopId,
                         'user_id' => $user->id,

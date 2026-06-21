@@ -89,7 +89,7 @@ export function DateRangePicker() {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-5 rounded-2xl border bg-card shadow-sm lg:flex-row lg:items-end lg:justify-between">
+    <div className="flex flex-col gap-4 p-5 rounded-2xl border border-border/60 bg-card shadow-sm lg:flex-row lg:items-end lg:justify-between">
       <div className="flex flex-wrap items-end gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="from-date" className="text-xs font-medium text-muted-foreground">

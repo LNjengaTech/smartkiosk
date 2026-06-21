@@ -124,6 +124,7 @@ export interface LocalExpense {
   amount: number;
   description: string | null;
   expenseDate: string;
+  receiptUrl: string | null;
   syncedAt: string | null;
   createdAt: string;
 }

@@ -223,7 +223,7 @@ export default function DashboardPage() {
       {/* ── Main Content Grid ──────────────────────────────────────────────── */}
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-7">
         {/* ── 7-Day Revenue Area Chart ──────────────────────────────────── */}
-        <div className="lg:col-span-4 rounded-2xl border bg-card p-6 shadow-sm">
+        <div className="lg:col-span-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="font-semibold text-lg">Revenue — Last 7 Days</h2>
@@ -288,8 +288,8 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Recent Transactions ───────────────────────────────────────── */}
-        <div className="lg:col-span-3 rounded-2xl border bg-card shadow-sm">
-          <div className="px-6 pt-6 pb-3 flex items-center justify-between border-b">
+        <div className="lg:col-span-3 rounded-2xl border border-border bg-card shadow-sm">
+          <div className="px-6 pt-6 pb-3 flex items-center justify-between border-b border-border">
             <div>
               <h2 className="font-semibold text-lg">Recent Sales</h2>
               <p className="text-sm text-muted-foreground">Last 10 transactions</p>
@@ -351,7 +351,7 @@ export default function DashboardPage() {
       {/* ── Bottom Row ─────────────────────────────────────────────────────── */}
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         {/* ── Top Products Bar Chart ──────────────────────────────────── */}
-        <div className="rounded-2xl border bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <div className="mb-4">
             <h2 className="font-semibold text-lg">Top Products Today</h2>
             <p className="text-sm text-muted-foreground">By revenue generated</p>
@@ -409,8 +409,8 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Low Stock Alerts ────────────────────────────────────────── */}
-        <div className="rounded-2xl border bg-card shadow-sm">
-          <div className="px-6 pt-6 pb-3 flex items-center justify-between border-b">
+        <div className="rounded-2xl border border-border bg-card shadow-sm">
+          <div className="px-6 pt-6 pb-3 flex items-center justify-between border-b border-border">
             <div>
               <h2 className="font-semibold text-lg flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-amber-500" />

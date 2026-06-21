@@ -28,7 +28,7 @@ export function KpiCard({
 }: KpiCardProps) {
   if (isLoading) {
     return (
-      <div className="rounded-2xl border bg-card p-6 shadow-sm">
+      <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
         <div className="flex items-center justify-between space-y-0 pb-2">
           <Skeleton className="h-4 w-[100px]" />
           <Skeleton className="h-8 w-8 rounded-full" />
@@ -46,7 +46,7 @@ export function KpiCard({
   const isZero = trend && trend.value === 0
 
   return (
-    <div className="group rounded-2xl border bg-card p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/20">
+    <div className="group rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/20">
       <div className="flex items-center justify-between space-y-0 pb-2">
         <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
           {label}

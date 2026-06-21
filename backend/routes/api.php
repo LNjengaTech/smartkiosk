@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Dashboard\SupplierController;
 use App\Http\Controllers\Api\V1\Dashboard\SaleController;
 use App\Http\Controllers\Api\V1\Dashboard\MpesaController;
 use App\Http\Controllers\Api\V1\Dashboard\ReportController;
+use App\Http\Controllers\Api\V1\Dashboard\ExpenseController;
 use App\Http\Controllers\Api\V1\Sync\SyncController;
 use App\Http\Controllers\Api\V1\UploadController;
 use Illuminate\Support\Facades\Route;
@@ -106,6 +107,11 @@ Route::prefix('v1')->group(function () {
             Route::middleware('role:owner')->group(function () {
                 Route::apiResource('suppliers', SupplierController::class);
             });
+
+            // ==========================================
+            // Expense Management
+            // ==========================================
+            Route::apiResource('expenses', ExpenseController::class);
 
             // ==========================================
             // Reports & Business Intelligence

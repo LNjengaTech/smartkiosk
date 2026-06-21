@@ -55,7 +55,7 @@ class UploadRequest extends FormRequest
             'folder' => [
                 'required',
                 'string',
-                'in:smartkiosk/products,smartkiosk/categories',
+                'in:smartkiosk/products,smartkiosk/categories,smartkiosk/expenses',
             ],
         ];
     }

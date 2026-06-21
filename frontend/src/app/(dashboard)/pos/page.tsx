@@ -237,7 +237,7 @@ export default function PosPage() {
   const CartPanel = (
     <div className="flex flex-col h-full">
       {/* Cart header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 shrink-0">
         <div className="flex items-center gap-2">
           <ShoppingCart className="h-5 w-5 text-primary" />
           <span className="font-semibold">Cart</span>
@@ -428,9 +428,9 @@ export default function PosPage() {
       {/* ── Desktop layout ────────────────────────────────────────────────────── */}
       <div className="hidden md:grid h-[calc(100vh-4rem)] grid-cols-[1fr_400px] overflow-hidden">
         {/* Left — product discovery */}
-        <div className="flex flex-col overflow-hidden border-r">
+        <div className="flex flex-col overflow-hidden border-r border-border/60">
           {/* Search bar */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b shrink-0">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-border/60 shrink-0">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -513,7 +513,7 @@ export default function PosPage() {
       {/* ── Mobile layout ─────────────────────────────────────────────────────── */}
       <div className="md:hidden flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
         {/* Search bar */}
-        <div className="flex items-center gap-2 px-3 py-3 border-b shrink-0">
+        <div className="flex items-center gap-2 px-3 py-3 border-b border-border/60 shrink-0">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -555,7 +555,7 @@ export default function PosPage() {
         {mobileCartOpen && (
           <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/50">
             <div className="bg-background rounded-t-2xl max-h-[85vh] flex flex-col overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 shrink-0">
                 <span className="font-semibold">Cart</span>
                 <Button variant="ghost" size="icon" onClick={() => setMobileCartOpen(false)}>
                   <X className="h-5 w-5" />

@@ -92,7 +92,7 @@ function ChartTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border bg-card p-3 shadow-md text-sm">
+    <div className="rounded-xl border border-border bg-card p-3 shadow-md text-sm">
       <p className="font-semibold text-foreground mb-1">
         {label && label.includes('-') ? format(parseISO(label), 'dd MMM yyyy') : label}
       </p>
@@ -292,7 +292,7 @@ export default function ReportsPage() {
               <>
                 {/* Sales metric summaries */}
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                       <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -303,7 +303,7 @@ export default function ReportsPage() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
                       <ShoppingCart className="h-4 w-4 text-muted-foreground" />
@@ -314,7 +314,7 @@ export default function ReportsPage() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <CardTitle className="text-sm font-medium">Average Order Value</CardTitle>
                       <Percent className="h-4 w-4 text-muted-foreground" />
@@ -325,7 +325,7 @@ export default function ReportsPage() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <CardTitle className="text-sm font-medium">Estimated Gross Profit</CardTitle>
                       <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -354,7 +354,7 @@ export default function ReportsPage() {
 
                 {/* Sales Chart Section */}
                 <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-                  <Card className="lg:col-span-2">
+                  <Card className="lg:col-span-2 border border-border">
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
                         <CardTitle>Sales Trend</CardTitle>
@@ -454,7 +454,7 @@ export default function ReportsPage() {
                   </Card>
 
                   {/* Payment Breakdown Pie */}
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader>
                       <CardTitle>Payment Methods</CardTitle>
                       <CardDescription>Sales distribution by checkout method</CardDescription>
@@ -515,7 +515,7 @@ export default function ReportsPage() {
             ) : stockData ? (
               <>
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <CardTitle className="text-sm font-medium">Total Stock Value</CardTitle>
                       <Package className="h-4 w-4 text-muted-foreground" />
@@ -526,7 +526,7 @@ export default function ReportsPage() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <CardTitle className="text-sm font-medium">Total Unique Products</CardTitle>
                       <Layers className="h-4 w-4 text-muted-foreground" />
@@ -537,7 +537,7 @@ export default function ReportsPage() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <CardTitle className="text-sm font-medium">Low Stock Alerts</CardTitle>
                       <AlertTriangle className="h-4 w-4 text-amber-500" />
@@ -550,7 +550,7 @@ export default function ReportsPage() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
                       <AlertTriangle className="h-4 w-4 text-rose-500" />
@@ -565,7 +565,7 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Stock Table */}
-                <Card>
+                <Card className='border border-border'>
                   <CardHeader>
                     <CardTitle>Inventory Valuation Ledger</CardTitle>
                     <CardDescription>Current quantity levels, pricing, and gross value per SKU.</CardDescription>
@@ -632,7 +632,7 @@ export default function ReportsPage() {
                 <>
                   {/* Profit metric summaries */}
                   <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                    <Card>
+                    <Card className='border border-border'>
                       <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -643,7 +643,7 @@ export default function ReportsPage() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className='border border-border'>
                       <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Cost of Goods Sold (COGS)</CardTitle>
                         <Package className="h-4 w-4 text-muted-foreground" />
@@ -656,7 +656,7 @@ export default function ReportsPage() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className='border border-border'>
                       <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Gross Profit Margin</CardTitle>
                         <TrendingUp className="h-4 w-4 text-emerald-500" />
@@ -669,7 +669,7 @@ export default function ReportsPage() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className='border border-border'>
                       <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Profit Margin Percentage</CardTitle>
                         <Percent className="h-4 w-4 text-muted-foreground" />
@@ -683,7 +683,7 @@ export default function ReportsPage() {
 
                   <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
                     {/* Daily Profit Trend Chart */}
-                    <Card className="lg:col-span-2">
+                    <Card className="lg:col-span-2 border border-border">
                       <CardHeader>
                         <CardTitle>Daily Profit Margin Trend</CardTitle>
                         <CardDescription>Timeline of daily profit versus revenue</CardDescription>
@@ -728,7 +728,7 @@ export default function ReportsPage() {
                     </Card>
 
                     {/* Top Profit Margins Table */}
-                    <Card>
+                    <Card className='border border-border'>
                       <CardHeader>
                         <CardTitle>Top Profit Products</CardTitle>
                         <CardDescription>Highest absolute profit yielders</CardDescription>
@@ -771,7 +771,7 @@ export default function ReportsPage() {
             {attendantLoading ? (
               <Skeleton className="h-[300px] w-full rounded-2xl" />
             ) : attendantData ? (
-              <Card>
+              <Card className='border border-border'>
                 <CardHeader>
                   <CardTitle>Attendant Performance Ledger</CardTitle>
                   <CardDescription>Check transaction volumes, total revenue, voids, and cashier void rates.</CardDescription>
@@ -849,7 +849,7 @@ export default function ReportsPage() {
             ) : expenseData ? (
               <>
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                       <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
                       <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -865,7 +865,7 @@ export default function ReportsPage() {
 
                 <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
                   {/* Category Breakdown Table */}
-                  <Card className="lg:col-span-2">
+                  <Card className="lg:col-span-2 border border-border">
                     <CardHeader>
                       <CardTitle>Expense Outflows by Category</CardTitle>
                       <CardDescription>Total expenses grouping breakdown</CardDescription>
@@ -907,7 +907,7 @@ export default function ReportsPage() {
                   </Card>
 
                   {/* Expenses Chart */}
-                  <Card>
+                  <Card className='border border-border'>
                     <CardHeader>
                       <CardTitle>Category Distribution</CardTitle>
                       <CardDescription>Share percentages of business expenses</CardDescription>

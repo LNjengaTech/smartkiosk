@@ -17,7 +17,7 @@ interface ImageUploadProps {
   value: string[];                   // ordered array of Cloudinary URLs
   onChange: (urls: string[]) => void;
   onRemove: (url: string) => void;
-  folder: 'smartkiosk/products' | 'smartkiosk/categories';
+  folder: 'smartkiosk/products' | 'smartkiosk/categories' | 'smartkiosk/expenses';
   maxImages?: number;                // default: 8
   disabled?: boolean;
 }

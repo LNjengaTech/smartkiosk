@@ -211,26 +211,34 @@ class SyncEngine {
     entries: SyncQueueEntry[],
   ): Promise<Array<{ success: boolean; error?: string }>> {
     try {
-      const batchPayload = entries.map((entry) => ({
-        operation_uuid: entry.operationUuid,
-        resource: entry.resource,
-        operation: entry.operation,
-        payload: entry.payload,
-      }));
+      const batchPayload = entries.map((entry) => {
+        const payloadObj = entry.payload as Record<string, unknown> | null;
+        return {
+          operationUuid: entry.operationUuid,
+          operationType: entry.operation,
+          resourceType: entry.resource,
+          resourceUuid: payloadObj?.uuid || null,
+          payload: entry.payload,
+          occurredAt: payloadObj?.expenseDate || payloadObj?.soldAt || entry.createdAt,
+        };
+      });
 
       const response = await apiClient.post<{
         success: boolean;
-        data: Array<{ operation_uuid: string; success: boolean; error?: string }>;
+        results: Array<{ operationUuid: string; status: string; message?: string }>;
       }>('/sync/batch', { operations: batchPayload });
 
       // Map results back to original entry order
       const resultMap = new Map(
-        response.data.data.map((r) => [r.operation_uuid, r]),
+        response.data.results.map((r) => [r.operationUuid, r]),
       );
 
       return entries.map((entry) => {
         const result = resultMap.get(entry.operationUuid);
-        return result ?? { success: false, error: 'No result returned for operation.' };
+        if (result && (result.status === 'synced' || result.status === 'conflict')) {
+          return { success: true };
+        }
+        return { success: false, error: result?.message || 'No result returned for operation.' };
       });
     } catch (error: unknown) {
       // If the whole batch fails, mark all as failed

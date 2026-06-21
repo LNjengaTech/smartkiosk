@@ -223,7 +223,7 @@ export default function CategoriesPage() {
 
       {/* Main Categories Table or Empty State */}
       {categories.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/60 p-12 text-center bg-card">
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border p-12 text-center bg-card">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted">
             <Folder className="h-6 w-6 text-muted-foreground" />
           </div>
