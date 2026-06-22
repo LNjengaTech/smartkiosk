@@ -17,6 +17,7 @@ class CloudinaryService
     private const ALLOWED_FOLDERS = [
         'smartkiosk/products',
         'smartkiosk/categories',
+        'smartkiosk/expenses',
     ];
 
     /**
