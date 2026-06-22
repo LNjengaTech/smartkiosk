@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { nanoid } from 'nanoid';
 import {
   Form,
   FormControl,
@@ -19,7 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { syncEngine } from '@/lib/sync/sync-engine';
 import { getDb } from '@/lib/db/dexie';
-import { getErrorMessage } from '@/lib/utils';
+import { getErrorMessage, generateUUID } from '@/lib/utils';
 import type { SupplierResponse } from '@/types/api';
 
 const supplierSchema = z.object({
@@ -90,7 +89,7 @@ export function SupplierForm({ supplier, onSuccess }: SupplierFormProps) {
 
 
       } else {
-        const localUuid = nanoid();
+        const localUuid = generateUUID();
 
         await db.suppliers.add({
           uuid: localUuid,

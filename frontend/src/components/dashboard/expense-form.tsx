@@ -9,7 +9,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { nanoid } from 'nanoid';
 import { CalendarIcon, CheckCircle2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import {
@@ -36,7 +35,7 @@ import { ImageUpload } from '@/components/dashboard/image-upload';
 import { EXPENSE_CATEGORIES, type ExpenseCategoryValue } from '@/constants/expense-categories';
 import { syncEngine } from '@/lib/sync/sync-engine';
 import { getDb } from '@/lib/db/dexie';
-import { getErrorMessage } from '@/lib/utils';
+import { getErrorMessage, generateUUID } from '@/lib/utils';
 import type { ExpenseResponse } from '@/types/api';
 
 const toNum = (val: unknown) => (val === '' || val === null || val === undefined ? 0 : Number(val));
@@ -124,7 +123,7 @@ export function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
         });
       } else {
         // ── CREATE in Dexie ──
-        const localUuid = nanoid();
+        const localUuid = generateUUID();
 
         await db.expenses.add({
           uuid: localUuid,

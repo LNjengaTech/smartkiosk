@@ -59,6 +59,21 @@ export default function SuppliersPage() {
 
       if (navigator.onLine) {
         try {
+          // Fetch UUIDs pending deletion so we don't resurface them from the server
+          const pendingDeleteUuids = await syncEngine.getPendingDeleteUuids('suppliers');
+
+          // Fetch UUIDs of suppliers with pending or processing updates in the sync queue
+          const pendingOps = await db.syncQueue
+            .where('status')
+            .anyOf(['pending', 'processing'])
+            .toArray();
+          const pendingUpdateUuids = new Set(
+            pendingOps
+              .filter((op) => op.resource === 'suppliers')
+              .map((op) => (op.payload as any)?.uuid)
+              .filter(Boolean)
+          );
+
           const response = await apiClient.get<{ success: boolean; data: SupplierResponse[] }>('/suppliers');
           const serverSuppliers = response.data.data;
 
@@ -66,6 +81,11 @@ export default function SuppliersPage() {
             const serverUuids = new Set(serverSuppliers.map((s) => s.uuid));
             
             for (const ssup of serverSuppliers) {
+              // Skip suppliers queued for deletion — don't resurrect them
+              if (pendingDeleteUuids.has(ssup.uuid)) continue;
+              // Skip updating suppliers with local pending changes to avoid race conditions
+              if (pendingUpdateUuids.has(ssup.uuid)) continue;
+
               const existing = await db.suppliers.where('uuid').equals(ssup.uuid).first();
               if (existing) {
                 await db.suppliers.update(existing.id!, {
@@ -97,7 +117,7 @@ export default function SuppliersPage() {
 
             const allLocal = await db.suppliers.toArray();
             for (const lsup of allLocal) {
-              if (lsup.syncedAt !== null && !serverUuids.has(lsup.uuid)) {
+              if (lsup.syncedAt !== null && !serverUuids.has(lsup.uuid) && !pendingDeleteUuids.has(lsup.uuid)) {
                 await db.suppliers.delete(lsup.id!);
               }
             }
@@ -105,9 +125,11 @@ export default function SuppliersPage() {
 
           const updatedLocal = await db.suppliers.toArray();
           setSuppliers(
-            updatedLocal.map((sup) => ({
-              id: sup.id?.toString() ?? '',
-              uuid: sup.uuid,
+            updatedLocal
+              .filter((sup) => !pendingDeleteUuids.has(sup.uuid))
+              .map((sup) => ({
+                id: sup.id?.toString() ?? '',
+                uuid: sup.uuid,
               shopId: sup.shopId.toString(),
               name: sup.name,
               phone: sup.phone,

@@ -4,6 +4,7 @@
 
 import { create } from 'zustand';
 import { toast } from 'sonner';
+import { generateUUID } from '@/lib/utils';
 import type { ProductResponse } from '@/types/api';
 import type {
   CartItem,
@@ -242,9 +243,8 @@ export const useCartStore = create<CartStore>((set, get) => ({
       return;
     }
 
-    const { nanoid } = await import('nanoid');
     const held: HeldCart = {
-      id: nanoid(),
+      id: generateUUID(),
       label: label ?? `Cart — ${new Date().toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' })}`,
       items: [...current.items],
       createdAt: new Date().toISOString(),

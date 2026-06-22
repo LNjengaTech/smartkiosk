@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/table';
 import { getDb } from '@/lib/db/dexie';
 import { syncEngine } from '@/lib/sync/sync-engine';
-import { formatCurrency, formatDateTime, getErrorMessage } from '@/lib/utils';
+import { formatCurrency, formatDateTime, getErrorMessage, generateUUID } from '@/lib/utils';
 import apiClient from '@/lib/api/client';
 import type { StockMovementResponse, StockValuationResponse, ProductResponse } from '@/types/api';
 
@@ -159,8 +159,7 @@ export default function StockPage() {
       await db.products.update(productId, { quantity: newQty });
 
       // 2. Add stock movement to local IndexedDB
-      const { nanoid } = await import('nanoid');
-      const localUuid = nanoid();
+      const localUuid = generateUUID();
       await db.stockMovements.add({
         uuid: localUuid,
         shopId: localProduct.shopId,

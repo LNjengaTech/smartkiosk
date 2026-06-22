@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button';
 import { ImageUpload } from '@/components/dashboard/image-upload';
 import { syncEngine } from '@/lib/sync/sync-engine';
 import { getDb } from '@/lib/db/dexie';
-import { getErrorMessage } from '@/lib/utils';
+import { getErrorMessage, generateUUID } from '@/lib/utils';
 import type { CategoryResponse } from '@/types/api';
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
@@ -92,19 +92,16 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
         });
 
         // Enqueue to sync engine
-        await syncEngine.enqueue('categories', 'UPDATE', {
+        await syncEngine.enqueue('category', 'UPDATE', {
           id:          category.id,
           uuid:        category.uuid,
           name:        values.name,
           description: values.description || null,
           image_url:   values.image_url   || null,
         });
-
-
       } else {
         // ── Create mode — write to IndexedDB immediately ──
-        const { nanoid } = await import('nanoid');
-        const localUuid = nanoid();
+        const localUuid = generateUUID();
 
         await db.categories.add({
           uuid:        localUuid,
@@ -116,19 +113,18 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
         });
 
         // Enqueue to sync engine
-        await syncEngine.enqueue('categories', 'CREATE', {
+        await syncEngine.enqueue('category', 'CREATE', {
           uuid:        localUuid,
           name:        values.name,
           description: values.description || null,
           image_url:   values.image_url   || null,
         });
-
-
       }
 
       toast.success('Category saved');
       onSuccess();
     } catch (error: unknown) {
+      console.error('[CategoryForm] Save error:', error);
       toast.error(getErrorMessage(error) || 'Failed to save category.');
     }
   };

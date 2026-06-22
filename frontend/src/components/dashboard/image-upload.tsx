@@ -81,7 +81,10 @@ export function ImageUpload({
         const newUrl = response.data.data.url;
         onChange([...value, newUrl]);
       } catch (error: unknown) {
-        toast.error(getErrorMessage(error) || 'Upload failed. Please try again.');
+        console.error('[ImageUpload] Upload failed:', error);
+        // Try to surface the specific API error message (e.g. validation, Cloudinary config)
+        const msg = getErrorMessage(error);
+        toast.error(msg || 'Upload failed. Please try again.');
       } finally {
         setIsUploading(false);
       }

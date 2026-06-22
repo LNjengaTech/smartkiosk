@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { useCartStore } from '@/lib/stores/cart-store';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { ReceiptModal } from '@/components/pos/receipt-modal';
+import { generateUUID } from '@/lib/utils';
 import type { ReceiptData, SalePayload, SaleItemPayload } from '@/types/pos';
 
 // ─── Tiny cha-ching audio ─────────────────────────────────────────────────────
@@ -51,11 +52,10 @@ export function SaleConfirmDialog({ open, onClose }: SaleConfirmDialogProps) {
     setIsSubmitting(true);
 
     try {
-      const { nanoid } = await import('nanoid');
       const { db } = await import('@/lib/db/dexie');
       const { syncEngine } = await import('@/lib/sync/sync-engine');
 
-      const saleUuid = nanoid();
+      const saleUuid = generateUUID();
 
       // Build receipt number (client-side placeholder — updated by server on sync)
       const year = new Date().getFullYear();
@@ -63,7 +63,7 @@ export function SaleConfirmDialog({ open, onClose }: SaleConfirmDialogProps) {
 
       // Build sale items payload
       const saleItems: SaleItemPayload[] = cart.items.map((item) => ({
-        uuid: nanoid(),
+        uuid: generateUUID(),
         productUuid: item.productUuid,
         productName: item.name,
         quantity: item.quantity,

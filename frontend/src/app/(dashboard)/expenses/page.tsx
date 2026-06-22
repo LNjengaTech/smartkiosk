@@ -99,6 +99,21 @@ export default function ExpensesPage() {
 
       if (navigator.onLine) {
         try {
+          // Fetch UUIDs pending deletion so we don't resurface them from the server
+          const pendingDeleteUuids = await syncEngine.getPendingDeleteUuids('expense');
+
+          // Fetch UUIDs of expenses with pending or processing updates in the sync queue
+          const pendingOps = await db.syncQueue
+            .where('status')
+            .anyOf(['pending', 'processing'])
+            .toArray();
+          const pendingUpdateUuids = new Set(
+            pendingOps
+              .filter((op) => op.resource === 'expense')
+              .map((op) => (op.payload as any)?.uuid)
+              .filter(Boolean)
+          );
+
           const response = await apiClient.get<{ success: boolean; data: ExpenseResponse[] }>('/expenses');
           const serverExpenses = response.data.data;
 
@@ -106,6 +121,11 @@ export default function ExpensesPage() {
             const serverUuids = new Set(serverExpenses.map((e) => e.uuid));
 
             for (const sexp of serverExpenses) {
+              // Skip expenses queued for deletion — don't resurrect them
+              if (pendingDeleteUuids.has(sexp.uuid)) continue;
+              // Skip updating expenses with local pending changes to avoid race conditions
+              if (pendingUpdateUuids.has(sexp.uuid)) continue;
+
               const existing = await db.expenses.where('uuid').equals(sexp.uuid).first();
               if (existing) {
                 await db.expenses.update(existing.id!, {
@@ -137,14 +157,16 @@ export default function ExpensesPage() {
             // Remove local synced items that no longer exist on server
             const allLocal = await db.expenses.toArray();
             for (const lexp of allLocal) {
-              if (lexp.syncedAt !== null && !serverUuids.has(lexp.uuid)) {
+              if (lexp.syncedAt !== null && !serverUuids.has(lexp.uuid) && !pendingDeleteUuids.has(lexp.uuid)) {
                 await db.expenses.delete(lexp.id!);
               }
             }
           });
 
           const updatedLocal = await db.expenses.orderBy('expenseDate').reverse().toArray();
-          const finalExpenses: ExpenseResponse[] = updatedLocal.map((exp) => {
+          const finalExpenses: ExpenseResponse[] = updatedLocal
+            .filter((exp) => !pendingDeleteUuids.has(exp.uuid))
+            .map((exp) => {
             const matchedServer = serverExpenses.find((s) => s.uuid === exp.uuid);
             return {
               id: exp.id?.toString() ?? '',

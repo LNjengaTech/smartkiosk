@@ -9,6 +9,7 @@
 import { getDb } from '@/lib/db/dexie';
 import apiClient from '@/lib/api/client';
 import { useSyncStore } from '@/lib/stores/sync-store';
+import { generateUUID } from '@/lib/utils';
 import type { SyncQueueEntry } from '@/types/db';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -22,7 +23,7 @@ const RETRY_BASE_DELAY_MS = 1_000; // 1 second base — doubles per retry
 let _isSyncing = false;
 let _syncTimeout: ReturnType<typeof setTimeout> | null = null;
 const BATCH_WINDOW_MS =
-  Number(process.env.NEXT_PUBLIC_SYNC_BATCH_WINDOW_MS) || 5_000;
+  Number(process.env.NEXT_PUBLIC_SYNC_BATCH_WINDOW_MS) || 2_000;
 
 // ─── Core Engine ─────────────────────────────────────────────────────────────
 
@@ -34,6 +35,16 @@ class SyncEngine {
     if (typeof window !== 'undefined') {
       window.addEventListener('online', () => this.onNetworkRestored());
       window.addEventListener('offline', () => this.onNetworkLost());
+
+      // Drain any items that were queued in a previous session but never flushed
+      // (e.g. user closed the tab during the debounce window).
+      // Use a short delay to let the DB initialise first.
+      setTimeout(() => {
+        if (navigator.onLine) {
+          console.info('[SyncEngine] Startup drain — flushing residual queue.');
+          void this.drain();
+        }
+      }, 1_500);
     }
   }
 
@@ -75,10 +86,8 @@ class SyncEngine {
     payload: unknown,
   ): Promise<number> {
     const db = getDb();
-    const { nanoid } = await import('nanoid');
-
     const entry: SyncQueueEntry = {
-      operationUuid: nanoid(),
+      operationUuid: generateUUID(),
       resource,
       operation,
       payload,
@@ -238,11 +247,23 @@ class SyncEngine {
         if (result && (result.status === 'synced' || result.status === 'conflict')) {
           return { success: true };
         }
-        return { success: false, error: result?.message || 'No result returned for operation.' };
+        const errMsg = result?.message || 'No result returned for operation.';
+        console.error(
+          `[SyncEngine] Operation failed — uuid=${entry.operationUuid} resource=${entry.resource} op=${entry.operation} error:`,
+          errMsg,
+          '| payload:',
+          entry.payload,
+        );
+        return { success: false, error: errMsg };
       });
     } catch (error: unknown) {
       // If the whole batch fails, mark all as failed
-      const message = error instanceof Error ? error.message : 'Batch submission failed.';
+      // Log the full error so HTTP status/body is visible in the console
+      const axiosError = error as { response?: { status: number; data: unknown }; message?: string };
+      const message = axiosError?.response
+        ? `HTTP ${axiosError.response.status}: ${JSON.stringify(axiosError.response.data)}`
+        : (error instanceof Error ? error.message : 'Batch submission failed.');
+      console.error('[SyncEngine] Batch POST failed:', message, '| entries:', entries.map((e) => ({ resource: e.resource, op: e.operation, uuid: (e.payload as Record<string, unknown>)?.uuid })));
       return entries.map(() => ({ success: false, error: message }));
     }
   }
@@ -263,6 +284,34 @@ class SyncEngine {
   async getFailedCount(): Promise<number> {
     const db = getDb();
     return db.syncQueue.where('status').equals('failed').count();
+  }
+
+  /**
+   * Returns a Set of UUIDs that have a pending or processing DELETE operation
+   * for the given resource type.
+   *
+   * Used by reconciliation loops to avoid re-adding server records that are
+   * queued for deletion on the client but have not yet reached the backend.
+   */
+  async getPendingDeleteUuids(resource: string): Promise<Set<string>> {
+    const db = getDb();
+    const pending = await db.syncQueue
+      .where('status')
+      .anyOf(['pending', 'processing'])
+      .filter(
+        (e) =>
+          e.resource === resource &&
+          e.operation === 'DELETE',
+      )
+      .toArray();
+
+    const uuids = new Set<string>();
+    for (const entry of pending) {
+      const payloadObj = entry.payload as Record<string, unknown> | null;
+      const uuid = payloadObj?.uuid as string | undefined;
+      if (uuid) uuids.add(uuid);
+    }
+    return uuids;
   }
 }
 

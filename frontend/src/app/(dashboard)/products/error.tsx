@@ -4,8 +4,9 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -13,8 +14,10 @@ interface ErrorProps {
 }
 
 export default function ProductsError({ error, reset }: ErrorProps) {
+  const router = useRouter();
+
   useEffect(() => {
-    console.error('Products catalog page boundary error:', error);
+    console.error('[Products] Error boundary triggered:', error);
   }, [error]);
 
   return (
@@ -29,10 +32,20 @@ export default function ProductsError({ error, reset }: ErrorProps) {
         <p className="text-sm text-muted-foreground">
           {error.message || 'An unexpected error occurred while fetching the product catalogue.'}
         </p>
+        {process.env.NODE_ENV === 'development' && error.stack && (
+          <pre className="mt-2 text-left text-xs text-destructive/80 bg-destructive/5 p-3 rounded-lg overflow-auto max-h-32 border border-destructive/20">
+            {error.stack}
+          </pre>
+        )}
       </div>
-      <Button onClick={() => reset()} variant="outline">
-        Try Again
-      </Button>
+      <div className="flex gap-3">
+        <Button onClick={() => reset()} variant="outline">
+          <RefreshCw className="mr-2 h-4 w-4" /> Try Again
+        </Button>
+        <Button onClick={() => router.push('/dashboard')} variant="ghost">
+          Go to Dashboard
+        </Button>
+      </div>
     </div>
   );
 }

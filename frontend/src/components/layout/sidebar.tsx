@@ -132,7 +132,12 @@ export function Sidebar() {
       {/* Nav Links */}
       <nav className="flex-1 space-y-1 p-3 overflow-y-auto overflow-x-hidden">
         {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+          // Use exact match for top-level routes that have sub-routes sharing
+          // the same prefix (e.g. /products should NOT activate for /products/categories).
+          const isActive =
+            item.href === '/products'
+              ? pathname === '/products'
+              : pathname.startsWith(item.href);
           return (
             <RoleGate key={item.href} anyRole={[...item.roles]}>
               <Link

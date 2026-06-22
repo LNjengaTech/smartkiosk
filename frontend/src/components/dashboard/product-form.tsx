@@ -34,7 +34,7 @@ import { BarcodeScanner } from '@/components/dashboard/barcode-scanner';
 import { getDb } from '@/lib/db/dexie';
 import { syncEngine } from '@/lib/sync/sync-engine';
 import { computeCompleteness } from '@/lib/product-completeness';
-import { getErrorMessage } from '@/lib/utils';
+import { getErrorMessage, generateUUID } from '@/lib/utils';
 import type { ProductResponse, CategoryResponse, SupplierResponse } from '@/types/api';
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
@@ -110,40 +110,45 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   // Fetch categories & suppliers from local Dexie database (offline-first)
   useEffect(() => {
     const loadDropdownData = async () => {
-      const db = getDb();
-      const localCats = await db.categories.toArray();
-      const localSups = await db.suppliers.toArray();
+      try {
+        const db = getDb();
+        const localCats = await db.categories.toArray();
+        const localSups = await db.suppliers.toArray();
 
-      setCategories(
-        localCats.map((cat) => ({
-          id: cat.id?.toString() ?? '',
-          uuid: cat.uuid,
-          shopId: cat.shopId.toString(),
-          name: cat.name,
-          description: cat.description,
-          imageUrl: cat.imageUrl,
-          productCount: 0,
-          createdAt: '',
-          updatedAt: '',
-        }))
-      );
+        setCategories(
+          localCats.map((cat) => ({
+            id: cat.id?.toString() ?? '',
+            uuid: cat.uuid,
+            shopId: cat.shopId.toString(),
+            name: cat.name,
+            description: cat.description,
+            imageUrl: cat.imageUrl,
+            productCount: 0,
+            createdAt: '',
+            updatedAt: '',
+          }))
+        );
 
-      setSuppliers(
-        localSups.map((sup) => ({
-          id: sup.id?.toString() ?? '',
-          uuid: sup.uuid,
-          shopId: sup.shopId.toString(),
-          name: sup.name,
-          phone: sup.phone,
-          email: sup.email,
-          address: sup.address,
-          notes: sup.notes,
-          productCount: 0,
-          stockMovementCount: 0,
-          createdAt: '',
-          updatedAt: '',
-        }))
-      );
+        setSuppliers(
+          localSups.map((sup) => ({
+            id: sup.id?.toString() ?? '',
+            uuid: sup.uuid,
+            shopId: sup.shopId.toString(),
+            name: sup.name,
+            phone: sup.phone,
+            email: sup.email,
+            address: sup.address,
+            notes: sup.notes,
+            productCount: 0,
+            stockMovementCount: 0,
+            createdAt: '',
+            updatedAt: '',
+          }))
+        );
+      } catch (err: unknown) {
+        console.error('[ProductForm] Failed to load dropdown data:', err);
+        // Non-fatal: dropdowns will just be empty
+      }
     };
 
     loadDropdownData();
@@ -216,6 +221,20 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     const db = getDb();
 
     try {
+      // Resolve category and supplier UUIDs from Dexie so the backend can do
+      // a safe FK lookup by uuid rather than relying on local integer IDs.
+      let categoryUuid: string | null = null;
+      let supplierUuid: string | null = null;
+
+      if (values.category_id) {
+        const cat = await db.categories.get(parseInt(values.category_id));
+        categoryUuid = cat?.uuid ?? null;
+      }
+      if (values.supplier_id) {
+        const sup = await db.suppliers.get(parseInt(values.supplier_id));
+        supplierUuid = sup?.uuid ?? null;
+      }
+
       if (isEditMode && product) {
         // ── UPDATE Product in Dexie IndexedDB ──
         await db.products.where('uuid').equals(product.uuid).modify({
@@ -234,12 +253,11 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           isActive: values.is_active,
         });
 
-        // Queue update in SyncEngine
-        await syncEngine.enqueue('products', 'UPDATE', {
-          id: parseInt(product.id),
+        // Queue update in SyncEngine — use UUIDs so backend can resolve real FK IDs
+        await syncEngine.enqueue('product', 'UPDATE', {
           uuid: product.uuid,
-          category_id: values.category_id ? parseInt(values.category_id) : null,
-          supplier_id: values.supplier_id ? parseInt(values.supplier_id) : null,
+          category_uuid: categoryUuid,
+          supplier_uuid: supplierUuid,
           name: values.name,
           sku: values.sku || null,
           barcode: values.barcode || null,
@@ -253,11 +271,9 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           is_active: values.is_active,
         });
 
-
       } else {
         // ── CREATE Product in Dexie IndexedDB ──
-        const { nanoid } = await import('nanoid');
-        const localUuid = nanoid();
+        const localUuid = generateUUID();
 
         await db.products.add({
           uuid: localUuid,
@@ -278,11 +294,11 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           syncedAt: null,
         });
 
-        // Queue creation in SyncEngine
-        await syncEngine.enqueue('products', 'CREATE', {
+        // Queue creation in SyncEngine — use UUIDs so backend can resolve real FK IDs
+        await syncEngine.enqueue('product', 'CREATE', {
           uuid: localUuid,
-          category_id: values.category_id ? parseInt(values.category_id) : null,
-          supplier_id: values.supplier_id ? parseInt(values.supplier_id) : null,
+          category_uuid: categoryUuid,
+          supplier_uuid: supplierUuid,
           name: values.name,
           sku: values.sku || null,
           barcode: values.barcode || null,
@@ -295,13 +311,12 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           image_url: values.image_url || null,
           is_active: values.is_active,
         });
-
-
       }
 
       toast.success('Product saved successfully');
       onSuccess();
     } catch (error: unknown) {
+      console.error('[ProductForm] Save error:', error);
       toast.error(getErrorMessage(error) || 'Failed to save product');
     }
   };

@@ -119,6 +119,21 @@ export default function ProductsPage() {
       // 3. Reconcile with API if online
       if (navigator.onLine) {
         try {
+          // Fetch UUIDs pending deletion so we don't resurface them from the server
+          const pendingDeleteUuids = await syncEngine.getPendingDeleteUuids('product');
+
+          // Fetch UUIDs of products with pending or processing updates in the sync queue
+          const pendingOps = await db.syncQueue
+            .where('status')
+            .anyOf(['pending', 'processing'])
+            .toArray();
+          const pendingUpdateUuids = new Set(
+            pendingOps
+              .filter((op) => op.resource === 'product')
+              .map((op) => (op.payload as any)?.uuid)
+              .filter(Boolean)
+          );
+
           const response = await apiClient.get<ProductListResponse>('/products', {
             params: { per_page: 200 },
           });
@@ -127,6 +142,11 @@ export default function ProductsPage() {
           await db.transaction('rw', db.products, async () => {
             // Upsert / overwrite server records in Dexie
             for (const sprod of serverProds) {
+              // Skip products queued for deletion — don't resurrect them
+              if (pendingDeleteUuids.has(sprod.uuid)) continue;
+              // Skip updating products with local pending changes to avoid race conditions
+              if (pendingUpdateUuids.has(sprod.uuid)) continue;
+
               const existing = await db.products.where('uuid').equals(sprod.uuid).first();
               if (existing) {
                 await db.products.update(existing.id!, {
@@ -171,7 +191,9 @@ export default function ProductsPage() {
             const serverUuids = new Set(serverProds.map((sp) => sp.uuid));
             const allLocal = await db.products.toArray();
             for (const lp of allLocal) {
-              if (lp.syncedAt !== null && !serverUuids.has(lp.uuid)) {
+              // Only delete synced items the server no longer knows about;
+              // leave pending-delete items alone — drain will handle them.
+              if (lp.syncedAt !== null && !serverUuids.has(lp.uuid) && !pendingDeleteUuids.has(lp.uuid)) {
                 await db.products.delete(lp.id!);
               }
             }
@@ -179,27 +201,30 @@ export default function ProductsPage() {
 
           // Reload updated local items
           const freshLocal = await db.products.toArray();
-          const freshMapped = freshLocal.map((p) => ({
-            id: p.id?.toString() ?? '',
-            uuid: p.uuid,
-            shopId: p.shopId.toString(),
-            categoryId: p.categoryId?.toString() ?? null,
-            supplierId: p.supplierId?.toString() ?? null,
-            name: p.name,
-            sku: p.sku,
-            barcode: p.barcode,
-            buyingPrice: p.buyingPrice,
-            sellingPrice: p.sellingPrice,
-            quantity: p.quantity,
-            reorderLevel: p.reorderLevel,
-            unit: p.unit,
-            expiryDate: p.expiryDate,
-            imageUrl: p.imageUrl,
-            isActive: p.isActive,
-            category: p.categoryId ? { id: p.categoryId.toString(), name: catMap.get(p.categoryId) ?? '' } : null,
-            createdAt: '',
-            updatedAt: '',
-          }));
+          const freshMapped = freshLocal
+            // Exclude products that are pending deletion from the UI
+            .filter((p) => !pendingDeleteUuids.has(p.uuid))
+            .map((p) => ({
+              id: p.id?.toString() ?? '',
+              uuid: p.uuid,
+              shopId: p.shopId.toString(),
+              categoryId: p.categoryId?.toString() ?? null,
+              supplierId: p.supplierId?.toString() ?? null,
+              name: p.name,
+              sku: p.sku,
+              barcode: p.barcode,
+              buyingPrice: p.buyingPrice,
+              sellingPrice: p.sellingPrice,
+              quantity: p.quantity,
+              reorderLevel: p.reorderLevel,
+              unit: p.unit,
+              expiryDate: p.expiryDate,
+              imageUrl: p.imageUrl,
+              isActive: p.isActive,
+              category: p.categoryId ? { id: p.categoryId.toString(), name: catMap.get(p.categoryId) ?? '' } : null,
+              createdAt: '',
+              updatedAt: '',
+            }));
 
           setProducts(freshMapped);
           calculateStats(freshMapped);
@@ -296,17 +321,19 @@ export default function ProductsPage() {
       await db.products.where('uuid').equals(prod.uuid).delete();
 
       // 2. Queue in Sync Engine
-      await syncEngine.enqueue('products', 'DELETE', {
+      await syncEngine.enqueue('product', 'DELETE', {
         id: prod.id ? parseInt(prod.id) : undefined,
         uuid: prod.uuid,
       });
 
-
-
       toast.success('Product removed successfully');
       setConfirmDeleteId(null);
-      loadData();
+      // Optimistically remove from UI state immediately (don't reload from server
+      // until sync engine has flushed the DELETE — otherwise the server record
+      // would be re-fetched and the item would reappear).
+      setProducts((prev) => prev.filter((p) => p.uuid !== prod.uuid));
     } catch (err: unknown) {
+      console.error('[ProductsPage] Delete error:', err);
       toast.error(getErrorMessage(err) || 'Failed to remove product.');
     }
   };

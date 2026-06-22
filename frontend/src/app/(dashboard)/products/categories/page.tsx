@@ -64,6 +64,21 @@ export default function CategoriesPage() {
       // 2. If online, fetch from backend to update local IndexedDB
       if (navigator.onLine) {
         try {
+          // Fetch UUIDs that are pending deletion so we don't re-add them
+          const pendingDeleteUuids = await syncEngine.getPendingDeleteUuids('category');
+
+          // Fetch UUIDs of categories with pending or processing updates in the sync queue
+          const pendingOps = await db.syncQueue
+            .where('status')
+            .anyOf(['pending', 'processing'])
+            .toArray();
+          const pendingUpdateUuids = new Set(
+            pendingOps
+              .filter((op) => op.resource === 'category')
+              .map((op) => (op.payload as any)?.uuid)
+              .filter(Boolean)
+          );
+
           const response = await apiClient.get<{ success: boolean; data: CategoryResponse[] }>('/categories');
           const serverCats = response.data.data;
 
@@ -71,6 +86,11 @@ export default function CategoriesPage() {
           await db.transaction('rw', db.categories, async () => {
             // Overwrite categories in IndexedDB with server data (excluding unsynced ones)
             for (const scat of serverCats) {
+              // Skip any category that is queued to be deleted — don't resurrect it
+              if (pendingDeleteUuids.has(scat.uuid)) continue;
+              // Skip updating categories with local pending changes to avoid race conditions
+              if (pendingUpdateUuids.has(scat.uuid)) continue;
+
               const existing = await db.categories.where('uuid').equals(scat.uuid).first();
               if (existing) {
                 await db.categories.update(existing.id!, {
@@ -98,7 +118,9 @@ export default function CategoriesPage() {
             const serverUuids = new Set(serverCats.map((c) => c.uuid));
             const allLocal = await db.categories.toArray();
             for (const lcat of allLocal) {
-              if (lcat.syncedAt !== null && !serverUuids.has(lcat.uuid)) {
+              // Only remove synced items that the server no longer has
+              // and are NOT currently pending a delete (they will be cleaned up by the drain)
+              if (lcat.syncedAt !== null && !serverUuids.has(lcat.uuid) && !pendingDeleteUuids.has(lcat.uuid)) {
                 await db.categories.delete(lcat.id!);
               }
             }
@@ -107,17 +129,20 @@ export default function CategoriesPage() {
           // Reload from IndexedDB to show updated state
           const updatedLocal = await db.categories.toArray();
           setCategories(
-            updatedLocal.map((cat) => ({
-              id: cat.id?.toString() ?? '',
-              uuid: cat.uuid,
-              shopId: cat.shopId.toString(),
-              name: cat.name,
-              description: cat.description,
-              imageUrl: cat.imageUrl,
-              productCount: cat.productCount ?? 0,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            }))
+            updatedLocal
+              // Hide categories that are pending deletion from UI
+              .filter((cat) => !pendingDeleteUuids.has(cat.uuid))
+              .map((cat) => ({
+                id: cat.id?.toString() ?? '',
+                uuid: cat.uuid,
+                shopId: cat.shopId.toString(),
+                name: cat.name,
+                description: cat.description,
+                imageUrl: cat.imageUrl,
+                productCount: cat.productCount ?? 0,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              }))
           );
         } catch (err: unknown) {
           console.warn('[Categories] Failed to sync with backend:', getErrorMessage(err));
@@ -159,17 +184,19 @@ export default function CategoriesPage() {
       await db.categories.where('uuid').equals(category.uuid).delete();
 
       // 2. Queue to sync engine
-      await syncEngine.enqueue('categories', 'DELETE', {
+      await syncEngine.enqueue('category', 'DELETE', {
         id: category.id ? parseInt(category.id) : undefined,
         uuid: category.uuid,
       });
 
-
-
       toast.success('Category deleted successfully');
       setConfirmDeleteId(null);
-      loadCategories();
+      // Optimistically remove from UI state immediately (don't reload from server
+      // until sync engine has flushed the DELETE — otherwise the server record
+      // would be re-fetched and the item would reappear).
+      setCategories((prev) => prev.filter((c) => c.uuid !== category.uuid));
     } catch (error: unknown) {
+      console.error('[CategoriesPage] Delete error:', error);
       toast.error(getErrorMessage(error) || 'Failed to delete category');
     }
   };
