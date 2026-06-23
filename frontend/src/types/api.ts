@@ -39,6 +39,7 @@ export interface UserRole {
 export type RoleName = 'super_admin' | 'owner' | 'manager' | 'cashier';
 
 export interface AuthUser {
+  id: number;
   uuid: string;
   name: string;
   email: string;

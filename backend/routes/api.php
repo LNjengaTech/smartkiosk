@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\V1\Dashboard\ReportController;
 use App\Http\Controllers\Api\V1\Dashboard\ExpenseController;
 use App\Http\Controllers\Api\V1\Sync\SyncController;
 use App\Http\Controllers\Api\V1\UploadController;
+use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\Dashboard\ShopPreferencesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +55,16 @@ Route::prefix('v1')->group(function () {
         // Offline Sync Engine Batch Processing
         // ==========================================
         Route::post('/sync/batch', [SyncController::class, 'batch']);
+
+        // ==========================================
+        // Notifications Center
+        // ==========================================
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+        Route::post('/notifications/sync-failed', [NotificationController::class, 'reportSyncFailed']);
+
 
         // ==========================================
         // Product SmartScan finder (<50ms target)
@@ -106,6 +118,8 @@ Route::prefix('v1')->group(function () {
             // ==========================================
             Route::middleware('role:owner')->group(function () {
                 Route::apiResource('suppliers', SupplierController::class);
+                Route::get('/shops/notification-preferences', [ShopPreferencesController::class, 'getNotificationPreferences']);
+                Route::patch('/shops/notification-preferences', [ShopPreferencesController::class, 'updateNotificationPreferences']);
             });
 
             // ==========================================

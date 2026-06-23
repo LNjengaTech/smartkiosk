@@ -83,4 +83,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(StockMovement::class, 'user_id');
     }
+
+    /**
+     * Define the channel name for broadcasting notifications.
+     */
+    public function receivesBroadcastNotificationsOn(): string
+    {
+        return 'user.'.$this->id;
+    }
 }

@@ -13,6 +13,8 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+use Illuminate\Notifications\Messages\BroadcastMessage;
+
 class ExpiryAlertNotification extends Notification implements ShouldQueue
 {
     use Queueable;
@@ -31,7 +33,7 @@ class ExpiryAlertNotification extends Notification implements ShouldQueue
      */
     public function via(mixed $notifiable): array
     {
-        $channels = ['database'];
+        $channels = ['database', 'broadcast'];
 
         $prefs = $notifiable->shop?->notification_preferences['expiry_alert'] ?? [];
 
@@ -69,6 +71,34 @@ class ExpiryAlertNotification extends Notification implements ShouldQueue
                 'products' => $this->products,
             ],
         ];
+    }
+
+    /**
+     * Broadcast notification payload.
+     *
+     * @param  mixed  $notifiable
+     */
+    public function toBroadcast(mixed $notifiable): BroadcastMessage
+    {
+        $count = count($this->products);
+        $first = $this->products[0] ?? null;
+
+        $message = $count === 1 && $first !== null
+            ? "{$first['name']} expires in {$first['daysRemaining']} day(s)"
+            : "{$count} products expiring within 7 days";
+
+        return new BroadcastMessage([
+            'id' => $this->id,
+            'type' => 'expiry_alert',
+            'title' => 'Expiry alert',
+            'message' => $message,
+            'data' => [
+                'shopName' => $this->shopName,
+                'productCount' => $count,
+                'products' => $this->products,
+            ],
+            'createdAt' => now()->toIso8601String(),
+        ]);
     }
 
     /**

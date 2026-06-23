@@ -13,6 +13,8 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+use Illuminate\Notifications\Messages\BroadcastMessage;
+
 class SaleVoidedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
@@ -35,7 +37,7 @@ class SaleVoidedNotification extends Notification implements ShouldQueue
      */
     public function via(mixed $notifiable): array
     {
-        $channels = ['database'];
+        $channels = ['database', 'broadcast'];
 
         $prefs = $notifiable->shop?->notification_preferences['sale_voided'] ?? [];
 
@@ -69,6 +71,30 @@ class SaleVoidedNotification extends Notification implements ShouldQueue
                 'items' => $this->items,
             ],
         ];
+    }
+
+    /**
+     * Broadcast notification payload.
+     *
+     * @param  mixed  $notifiable
+     */
+    public function toBroadcast(mixed $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'id' => $this->id,
+            'type' => 'sale_voided',
+            'title' => "Sale voided — {$this->receiptNumber}",
+            'message' => "KES ".number_format($this->total, 2)." voided by {$this->voidedBy}",
+            'data' => [
+                'shopName' => $this->shopName,
+                'receiptNumber' => $this->receiptNumber,
+                'total' => $this->total,
+                'voidedBy' => $this->voidedBy,
+                'voidedAt' => $this->voidedAt,
+                'items' => $this->items,
+            ],
+            'createdAt' => now()->toIso8601String(),
+        ]);
     }
 
     /**

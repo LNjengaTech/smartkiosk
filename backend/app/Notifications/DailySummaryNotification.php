@@ -13,6 +13,8 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+use Illuminate\Notifications\Messages\BroadcastMessage;
+
 class DailySummaryNotification extends Notification implements ShouldQueue
 {
     use Queueable;
@@ -37,7 +39,7 @@ class DailySummaryNotification extends Notification implements ShouldQueue
      */
     public function via(mixed $notifiable): array
     {
-        $channels = ['database'];
+        $channels = ['database', 'broadcast'];
 
         $prefs = $notifiable->shop?->notification_preferences['daily_summary'] ?? [];
 
@@ -72,6 +74,31 @@ class DailySummaryNotification extends Notification implements ShouldQueue
                 'lowStockCount' => $this->lowStockCount,
             ],
         ];
+    }
+
+    /**
+     * Broadcast notification payload.
+     *
+     * @param  mixed  $notifiable
+     */
+    public function toBroadcast(mixed $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'id' => $this->id,
+            'type' => 'daily_summary',
+            'title' => "Daily summary — {$this->date}",
+            'message' => "Revenue: KES ".number_format($this->todayRevenue, 2)." · {$this->todayOrders} orders · Profit: KES ".number_format($this->todayProfit, 2),
+            'data' => [
+                'shopName' => $this->shopName,
+                'date' => $this->date,
+                'todayRevenue' => $this->todayRevenue,
+                'todayOrders' => $this->todayOrders,
+                'todayProfit' => $this->todayProfit,
+                'topProduct' => $this->topProduct,
+                'lowStockCount' => $this->lowStockCount,
+            ],
+            'createdAt' => now()->toIso8601String(),
+        ]);
     }
 
     /**

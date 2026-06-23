@@ -11,6 +11,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
+use Illuminate\Notifications\Messages\BroadcastMessage;
+
 class SyncFailedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
@@ -26,7 +28,7 @@ class SyncFailedNotification extends Notification implements ShouldQueue
      */
     public function via(mixed $notifiable): array
     {
-        $channels = ['database'];
+        $channels = ['database', 'broadcast'];
 
         $prefs = $notifiable->shop?->notification_preferences['sync_failed'] ?? [];
 
@@ -56,6 +58,26 @@ class SyncFailedNotification extends Notification implements ShouldQueue
                 'oldestPendingAt' => $this->oldestPendingAt,
             ],
         ];
+    }
+
+    /**
+     * Broadcast notification payload.
+     *
+     * @param  mixed  $notifiable
+     */
+    public function toBroadcast(mixed $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'id' => $this->id,
+            'type' => 'sync_failed',
+            'title' => 'Sync queue stuck',
+            'message' => "{$this->pendingCount} pending operation(s) stuck since {$this->oldestPendingAt}",
+            'data' => [
+                'pendingCount' => $this->pendingCount,
+                'oldestPendingAt' => $this->oldestPendingAt,
+            ],
+            'createdAt' => now()->toIso8601String(),
+        ]);
     }
 
     /**

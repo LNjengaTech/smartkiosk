@@ -57,6 +57,7 @@ class AuthController extends Controller
 
         // 6. Structure standard user payload profile
         $userPayload = [
+            'id' => $user->id,
             'uuid' => $user->uuid,
             'name' => $user->name,
             'email' => $user->email,
@@ -114,6 +115,7 @@ class AuthController extends Controller
         $user->load('shop');
 
         $userPayload = [
+            'id' => $user->id,
             'uuid' => $user->uuid,
             'name' => $user->name,
             'email' => $user->email,

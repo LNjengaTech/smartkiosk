@@ -13,6 +13,8 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+use Illuminate\Notifications\Messages\BroadcastMessage;
+
 class LowStockNotification extends Notification implements ShouldQueue
 {
     use Queueable;
@@ -33,7 +35,7 @@ class LowStockNotification extends Notification implements ShouldQueue
      */
     public function via(mixed $notifiable): array
     {
-        $channels = ['database'];
+        $channels = ['database', 'broadcast'];
 
         $prefs = $notifiable->shop?->notification_preferences['low_stock'] ?? [];
 
@@ -68,6 +70,29 @@ class LowStockNotification extends Notification implements ShouldQueue
                 'shopName' => $this->shopName,
             ],
         ];
+    }
+
+    /**
+     * Broadcast notification payload.
+     *
+     * @param  mixed  $notifiable
+     */
+    public function toBroadcast(mixed $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'id' => $this->id,
+            'type' => 'low_stock',
+            'title' => "Low stock: {$this->productName}",
+            'message' => "{$this->currentQuantity} units left · reorder at {$this->reorderLevel}",
+            'data' => [
+                'productId' => $this->productId,
+                'productName' => $this->productName,
+                'currentQuantity' => $this->currentQuantity,
+                'reorderLevel' => $this->reorderLevel,
+                'shopName' => $this->shopName,
+            ],
+            'createdAt' => now()->toIso8601String(),
+        ]);
     }
 
     /**
