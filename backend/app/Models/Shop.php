@@ -29,11 +29,13 @@ class Shop extends Model
         'currency',
         'timezone',
         'is_active',
+        'notification_preferences',
         'synced_at',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'notification_preferences' => 'array',
         'synced_at' => 'datetime',
     ];
 

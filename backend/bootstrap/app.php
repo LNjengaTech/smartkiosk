@@ -5,6 +5,9 @@
 
 use App\Http\Middleware\CheckSubscriptionFeature;
 use App\Http\Middleware\EnsureShopAccess;
+use App\Models\Shop;
+use App\Services\AfricasTalkingService;
+use App\Services\NotificationService;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -13,6 +16,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -149,4 +153,44 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 500);
             }
         });
-    })->create();
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        // ── Low-stock & expiry checks — 08:00 Africa/Nairobi ──────────────────
+        $schedule->call(function () {
+            $notificationService = app(NotificationService::class);
+
+            Shop::where('is_active', true)
+                ->with('owner')
+                ->chunkById(50, function ($shops) use ($notificationService) {
+                    foreach ($shops as $shop) {
+                        $notificationService->checkAndNotifyLowStock($shop);
+                        $notificationService->checkAndNotifyExpiringSoon($shop);
+                    }
+                });
+        })->dailyAt('08:00')->timezone('Africa/Nairobi')->name('notify:stock-checks');
+
+        // ── Daily summary — 21:00 Africa/Nairobi ──────────────────────────────
+        $schedule->call(function () {
+            $notificationService = app(NotificationService::class);
+
+            Shop::where('is_active', true)
+                ->with('owner')
+                ->chunkById(50, function ($shops) use ($notificationService) {
+                    foreach ($shops as $shop) {
+                        $notificationService->sendDailySummary($shop);
+                    }
+                });
+        })->dailyAt('21:00')->timezone('Africa/Nairobi')->name('notify:daily-summary');
+    })
+    ->booted(function (Application $app) {
+        // ── Service singletons ────────────────────────────────────────────────
+        $app->singleton(AfricasTalkingService::class, fn () => new AfricasTalkingService(
+            username: config('services.africastalking.username'),
+            apiKey: config('services.africastalking.api_key'),
+        ));
+
+        $app->singleton(NotificationService::class, fn (Application $app) => new NotificationService(
+            reportService: $app->make(\App\Services\ReportService::class),
+        ));
+    })
+    ->create();

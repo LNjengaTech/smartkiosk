@@ -344,3 +344,36 @@ export interface StockValuationResponse {
   expiringSoonCount: number;
 }
 
+// ─── Notifications (Stage 5) ──────────────────────────────────────────────────
+
+export type NotificationType =
+  | 'low_stock'
+  | 'expiry_alert'
+  | 'daily_summary'
+  | 'sale_voided'
+  | 'sync_failed';
+
+export type NotificationChannel = 'in_app' | 'email' | 'sms';
+
+export interface NotificationPreferences {
+  low_stock: Record<NotificationChannel, boolean>;
+  expiry_alert: Record<NotificationChannel, boolean>;
+  daily_summary: Record<NotificationChannel, boolean>;
+  sale_voided: Record<NotificationChannel, boolean>;
+  sync_failed: Record<NotificationChannel, boolean>;
+}
+
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  data: Record<string, string | number | boolean>;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface NotificationsListResponse {
+  data: AppNotification[];
+  unreadCount: number;
+}
